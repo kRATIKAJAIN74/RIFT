@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 
 const DRUG_OPTIONS = [
 	'Warfarin',
@@ -58,71 +59,92 @@ export default function UploadPage() {
 	}
 
 	return (
-		<div className="min-h-screen bg-white flex items-center justify-center py-12 px-4">
-			<div className="w-full max-w-2xl rounded-xl border border-slate-100 bg-white p-8 shadow-lg">
-				<h1 className="mb-4 text-2xl font-semibold text-slate-900">
-					Pharmacogenomic Risk Analysis
-				</h1>
-				<p className="mb-6 text-sm text-slate-600">
-					Upload a VCF file and select drugs to generate CPIC-aligned risk predictions.
-				</p>
+		<div className="relative min-h-screen bg-slate-950 px-4 py-12 text-slate-100">
+			<div className="absolute inset-0 -z-10 overflow-hidden">
+				<div className="absolute left-[-140px] top-[-140px] h-[360px] w-[360px] rounded-full bg-sky-500/20 blur-3xl" />
+				<div className="absolute bottom-[-180px] right-[-120px] h-[420px] w-[420px] rounded-full bg-indigo-500/20 blur-3xl" />
+			</div>
 
-				{errors.length > 0 && (
-					<div className="mb-4 rounded-md border border-red-100 bg-red-50 p-3 text-sm text-red-800">
-						<ul className="list-disc list-inside">
-							{errors.map((err, i) => (
-								<li key={i}>{err}</li>
-							))}
-						</ul>
-					</div>
-				)}
+			<div className="mx-auto w-full max-w-3xl">
+				<div className="mb-6 flex items-center justify-between">
+					<Link to="/" className="inline-flex items-center rounded-full border border-white/20 px-4 py-2 text-sm font-medium text-slate-200 transition hover:border-sky-300/60 hover:text-sky-200">
+						← Back to Home
+					</Link>
+					<span className="rounded-full border border-sky-300/40 bg-sky-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-sky-200">
+						Secure Upload
+					</span>
+				</div>
 
-				<form onSubmit={onSubmit} className="space-y-6">
-					<div>
-						<label className="block text-sm font-medium text-slate-700">VCF File</label>
-						<div className="mt-2">
-							<input
-								type="file"
-								accept=".vcf"
-								onChange={onFileChange}
-								className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700"
-							/>
-							<p className="mt-2 text-xs text-slate-500">Accepted: .vcf — Max 5MB</p>
+				<div className="w-full rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl shadow-black/30 backdrop-blur-xl">
+					<h1 className="mb-3 text-2xl font-semibold text-white md:text-3xl">
+						Pharmacogenomic Risk Analysis
+					</h1>
+					<p className="mb-6 text-sm text-slate-300 md:text-base">
+						Upload a VCF file and select drugs to generate CPIC-aligned risk predictions.
+					</p>
+
+					{errors.length > 0 && (
+						<div className="mb-4 rounded-xl border border-red-300/30 bg-red-500/10 p-3 text-sm text-red-100">
+							<ul className="list-disc list-inside">
+								{errors.map((err, i) => (
+									<li key={i}>{err}</li>
+								))}
+							</ul>
 						</div>
-					</div>
+					)}
 
-					<div>
-						<label className="block text-sm font-medium text-slate-700">Select Drugs</label>
-						<div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
-							{DRUG_OPTIONS.map((drug) => (
-								<label
-									key={drug}
-									className={`flex cursor-pointer items-center gap-3 rounded-md border border-slate-100 px-3 py-2 text-sm transition hover:bg-sky-50 ${
-										selectedDrugs.includes(drug) ? 'bg-sky-50 border-sky-200' : 'bg-white'
-									}`}
-								>
-									<input
-										type="checkbox"
-										checked={selectedDrugs.includes(drug)}
-										onChange={() => onDrugToggle(drug)}
-										className="h-4 w-4 rounded border-slate-300 text-sky-600 focus:ring-sky-500"
-									/>
-									<span className="select-none text-slate-800">{drug}</span>
-								</label>
-							))}
+					<form onSubmit={onSubmit} className="space-y-6">
+						<div>
+							<label className="block text-sm font-medium text-slate-200">VCF File</label>
+							<div className="mt-2 rounded-xl border border-white/10 bg-slate-900/50 p-3">
+								<input
+									type="file"
+									accept=".vcf"
+									onChange={onFileChange}
+									className="w-full rounded-md border border-white/15 bg-slate-900 px-3 py-2 text-sm text-slate-200 file:mr-4 file:rounded-full file:border-0 file:bg-sky-500 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-sky-400"
+								/>
+								<p className="mt-2 text-xs text-slate-400">Accepted: .vcf — Max 5MB</p>
+								{file && (
+									<p className="mt-2 text-xs text-sky-200">Selected: {file.name}</p>
+								)}
+							</div>
 						</div>
-					</div>
 
-					<div className="flex items-center justify-end gap-3">
-						<button
-							type="submit"
-							disabled={submitting}
-							className="inline-flex items-center gap-2 rounded-full bg-sky-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition disabled:opacity-60 hover:bg-sky-700"
-						>
-							Analyze Risk
-						</button>
-					</div>
-				</form>
+						<div>
+							<label className="block text-sm font-medium text-slate-200">Select Drugs</label>
+							<div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
+								{DRUG_OPTIONS.map((drug) => (
+									<label
+										key={drug}
+										className={`flex cursor-pointer items-center gap-3 rounded-xl border px-3 py-2 text-sm transition ${
+											selectedDrugs.includes(drug)
+												? 'border-sky-300/60 bg-sky-400/15 text-white'
+												: 'border-white/10 bg-white/5 text-slate-200 hover:border-sky-300/40 hover:bg-white/10'
+										}`}
+									>
+										<input
+											type="checkbox"
+											checked={selectedDrugs.includes(drug)}
+											onChange={() => onDrugToggle(drug)}
+											className="h-4 w-4 rounded border-white/30 bg-slate-900 text-sky-500 focus:ring-sky-500"
+										/>
+										<span className="select-none">{drug}</span>
+									</label>
+								))}
+							</div>
+						</div>
+
+						<div className="flex items-center justify-end gap-3 pt-2">
+							<button
+								type="submit"
+								disabled={submitting}
+								className="inline-flex items-center gap-2 rounded-full bg-sky-500 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-sky-900/50 transition hover:bg-sky-400 disabled:cursor-not-allowed disabled:opacity-60"
+							>
+								{submitting ? 'Analyzing...' : 'Analyze Risk'}
+							</button>
+						</div>
+					</form>
+				</div>
 			</div>
 		</div>
 	)

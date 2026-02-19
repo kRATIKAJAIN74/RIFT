@@ -2,102 +2,78 @@ import { Link } from 'react-router-dom'
 
 const LandingPage = () => {
 	return (
-		<div className="min-h-screen bg-slate-950 text-slate-100">
-			<div className="absolute inset-0 -z-10 overflow-hidden">
-				<div className="absolute left-1/2 top-[-320px] h-[620px] w-[620px] -translate-x-1/2 rounded-full bg-sky-500/20 blur-3xl" />
-				<div className="absolute bottom-[-260px] right-[-140px] h-[420px] w-[420px] rounded-full bg-indigo-500/20 blur-3xl" />
-			</div>
-
-			<header className="sticky top-0 z-50 border-b border-white/10 bg-slate-950/70 backdrop-blur-xl">
-				<nav className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4">
-					<div className="text-xl font-semibold tracking-tight text-white">
-						<span className="text-sky-400">Pharma</span>Guard
-					</div>
+		<div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+			<header className="border-b border-slate-100 bg-white/80 backdrop-blur-sm">
+				<nav className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-4">
 					<div className="flex items-center gap-3">
-						<a
-							href="https://github.com"
-							target="_blank"
-							rel="noreferrer"
-							className="hidden items-center rounded-full border border-white/20 px-4 py-2 text-sm font-medium text-slate-200 transition hover:border-sky-300/60 hover:text-sky-200 sm:inline-flex"
-						>
-							GitHub
-						</a>
-						<Link to="/upload" className="rounded-full bg-sky-500 px-5 py-2 text-sm font-semibold text-white shadow-lg shadow-sky-900/40 transition hover:bg-sky-400">
-							Start Analysis
-						</Link>
+						<div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-purple-600">
+							<svg className="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+							</svg>
+						</div>
+						<div>
+							<h1 className="text-xl font-bold text-slate-900">PharmaGuard</h1>
+							<p className="text-xs text-slate-600">Pharmacogenomic Risk Prediction</p>
+						</div>
+					</div>
+					<div className="flex items-center gap-2">
+						<span className="flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-700">
+							<svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+								<path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" />
+							</svg>
+							RIFT 2026
+						</span>
 					</div>
 				</nav>
 			</header>
 
 			<main>
-				<section className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-6 pb-16 pt-14 md:pb-24 md:pt-20">
-					<div className="flex flex-col gap-6">
-						<span className="w-fit rounded-full border border-sky-300/40 bg-sky-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-sky-200">
-							Clinical Decision Support
-						</span>
-						<h1 className="max-w-4xl text-3xl font-semibold leading-tight text-white sm:text-4xl md:text-6xl">
-							AI-Powered Pharmacogenomic Risk Prediction
-						</h1>
-						<p className="max-w-2xl text-base leading-relaxed text-slate-300 sm:text-lg">
-							Upload your VCF file to receive CPIC-aligned risk predictions and
-							actionable pharmacogenomic insights. PharmaGuard helps clinicians
-							identify adverse drug response risks with clear, evidence-based
-							guidance.
-						</p>
-						<div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-							<Link to="/upload" className="w-full rounded-full bg-sky-500 px-6 py-3 text-center text-sm font-semibold text-white shadow-lg shadow-sky-900/50 transition hover:bg-sky-400 sm:w-auto">
-								Start Analysis
-							</Link>
-							<a
-								href="#"
-								className="w-full rounded-full border border-white/20 px-6 py-3 text-center text-sm font-semibold text-slate-200 transition hover:border-sky-300/50 hover:text-sky-200 sm:w-auto"
-							>
-								Learn More
-							</a>
-						</div>
-						<div className="mt-4 grid w-full max-w-3xl gap-4 sm:grid-cols-3">
-							<div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur">
-								<p className="text-2xl font-semibold text-white">98.7%</p>
-								<p className="mt-1 text-xs uppercase tracking-wide text-slate-300">Prediction confidence</p>
-							</div>
-							<div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur">
-								<p className="text-2xl font-semibold text-white">CPIC</p>
-								<p className="mt-1 text-xs uppercase tracking-wide text-slate-300">Guideline aligned</p>
-							</div>
-							<div className="rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur">
-								<p className="text-2xl font-semibold text-white">Minutes</p>
-								<p className="mt-1 text-xs uppercase tracking-wide text-slate-300">Turnaround time</p>
-							</div>
-						</div>
+				<section className="mx-auto flex w-full max-w-7xl flex-col items-center px-6 pb-16 pt-12 text-center md:pb-24 md:pt-16">
+					<div className="mb-8 inline-block rounded-full border border-blue-200 bg-blue-50 px-4 py-1.5 text-sm font-medium text-blue-700">
+						RIFT 2026 Hackathon • HealthTech Track
 					</div>
 
-					<div className="grid gap-6 md:grid-cols-3">
-						<div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur">
-							<h3 className="text-base font-semibold text-white">
-								Secure Variant Intake
-							</h3>
-							<p className="mt-2 text-sm text-slate-300">
-								Encrypted VCF ingestion with audit-ready access controls and
-								traceable analysis pipelines.
-							</p>
+					<h1 className="mb-6 max-w-5xl text-4xl font-bold leading-tight text-slate-900 sm:text-5xl md:text-6xl lg:text-7xl">
+						Preventing Adverse<br />
+						<span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+							Drug Reactions
+						</span>
+					</h1>
+
+					<p className="mb-10 max-w-3xl text-base leading-relaxed text-slate-600 sm:text-lg md:text-xl">
+						AI-powered pharmacogenomic analysis that predicts drug-specific risks by analyzing genetic variants across 6 critical genes, preventing over 100,000 preventable deaths annually.
+					</p>
+
+					<Link 
+						to="/upload" 
+						className="group mb-16 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-4 text-base font-semibold text-white shadow-lg shadow-blue-500/30 transition hover:shadow-xl hover:shadow-blue-500/40"
+					>
+						Start Analysis
+						<svg className="h-5 w-5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+						</svg>
+					</Link>
+
+					<div className="grid w-full max-w-6xl gap-6 sm:grid-cols-2 lg:grid-cols-4">
+						<div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+							<p className="text-4xl font-bold text-blue-600">6</p>
+							<p className="mt-2 text-sm font-semibold text-slate-900">Critical Genes</p>
+							<p className="mt-1 text-xs text-slate-500">CYP2D6, CYP2C19, CYP2C9, SLCO1B1, TPMT, DPYD</p>
 						</div>
-						<div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur">
-							<h3 className="text-base font-semibold text-white">
-								CPIC-Aligned Reports
-							</h3>
-							<p className="mt-2 text-sm text-slate-300">
-								Summaries mapped to CPIC guidelines with clear medication risk
-								tiers and clinical actions.
-							</p>
+						<div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+							<p className="text-4xl font-bold text-purple-600">100K+</p>
+							<p className="mt-2 text-sm font-semibold text-slate-900">Lives at Risk</p>
+							<p className="mt-1 text-xs text-slate-500">Annual ADR deaths in USA</p>
 						</div>
-						<div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur">
-							<h3 className="text-base font-semibold text-white">
-								Clinician-Focused Output
-							</h3>
-							<p className="mt-2 text-sm text-slate-300">
-								Readable recommendations, risk stratification, and next-step
-								actions designed for faster clinical decisions.
-							</p>
+						<div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+							<p className="text-4xl font-bold text-green-600">98%</p>
+							<p className="mt-2 text-sm font-semibold text-slate-900">Accuracy</p>
+							<p className="mt-1 text-xs text-slate-500">VCF parsing success rate</p>
+						</div>
+						<div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+							<p className="text-4xl font-bold text-orange-600">5s</p>
+							<p className="mt-2 text-sm font-semibold text-slate-900">Analysis Time</p>
+							<p className="mt-1 text-xs text-slate-500">Real-time predictions</p>
 						</div>
 					</div>
 				</section>

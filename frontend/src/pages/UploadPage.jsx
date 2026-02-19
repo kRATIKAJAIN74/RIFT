@@ -2,11 +2,12 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
 const DRUG_OPTIONS = [
+	'Codeine',
 	'Warfarin',
 	'Clopidogrel',
 	'Simvastatin',
-	'Codeine',
-	'Thiopurines',
+	'Azathioprine',
+	'Fluorouracil',
 ]
 
 export default function UploadPage() {
@@ -15,6 +16,8 @@ export default function UploadPage() {
 	const [errors, setErrors] = useState([])
 	const [submitting, setSubmitting] = useState(false)
 	const [results, setResults] = useState(null)
+	const [dragActive, setDragActive] = useState(false)
+	const [customDrug, setCustomDrug] = useState('')
 
 	const validate = () => {
 		const errs = []
@@ -28,10 +31,34 @@ export default function UploadPage() {
 		return errs.length === 0
 	}
 
-	const onFileChange = (e) => {
+	const handleFile = (f) => {
 		setErrors([])
-		const f = e.target.files?.[0] ?? null
 		setFile(f)
+	}
+
+	const onFileChange = (e) => {
+		const f = e.target.files?.[0] ?? null
+		if (f) handleFile(f)
+	}
+
+	const handleDrag = (e) => {
+		e.preventDefault()
+		e.stopPropagation()
+		if (e.type === 'dragenter' || e.type === 'dragover') {
+			setDragActive(true)
+		} else if (e.type === 'dragleave') {
+			setDragActive(false)
+		}
+	}
+
+	const handleDrop = (e) => {
+		e.preventDefault()
+		e.stopPropagation()
+		setDragActive(false)
+		
+		if (e.dataTransfer.files?.[0]) {
+			handleFile(e.dataTransfer.files[0])
+		}
 	}
 
 	const onDrugToggle = (drug) => {
@@ -39,6 +66,15 @@ export default function UploadPage() {
 			s.includes(drug) ? s.filter((d) => d !== drug) : [...s, drug],
 		)
 		setErrors([])
+	}
+
+	const handleAddCustomDrug = () => {
+		const trimmed = customDrug.trim()
+		if (trimmed && !selectedDrugs.includes(trimmed)) {
+			setSelectedDrugs([...selectedDrugs, trimmed])
+			setCustomDrug('')
+			setErrors([])
+		}
 	}
 
 	const onSubmit = async (e) => {
@@ -78,33 +114,47 @@ export default function UploadPage() {
 	}
 
 	return (
-		<div className="relative min-h-screen bg-slate-950 px-4 py-12 text-slate-100">
-			<div className="absolute inset-0 -z-10 overflow-hidden">
-				<div className="absolute left-[-140px] top-[-140px] h-[360px] w-[360px] rounded-full bg-sky-500/20 blur-3xl" />
-				<div className="absolute bottom-[-180px] right-[-120px] h-[420px] w-[420px] rounded-full bg-indigo-500/20 blur-3xl" />
-			</div>
+		<div className="relative w-full">
+			{/* Background Video - Full Viewport */}
+			<video
+				autoPlay
+				loop
+				muted
+				playsInline
+				className="fixed inset-0 h-screen w-screen object-cover opacity-80"
+				style={{ zIndex: 0 }}
+			>
+				<source src="/hackathon.mp4" type="video/mp4" />
+			</video>
 
-			<div className="mx-auto w-full max-w-3xl">
-				<div className="mb-6 flex items-center justify-between">
-					<Link to="/" className="inline-flex items-center rounded-full border border-white/20 px-4 py-2 text-sm font-medium text-slate-200 transition hover:border-sky-300/60 hover:text-sky-200">
-						← Back to Home
+			{/* Content Overlay */}
+			<div className="relative z-10 min-h-screen bg-gradient-to-b from-slate-50/80 to-white/80 px-4 py-8 backdrop-blur-sm overflow-x-hidden">
+				<div className="mx-auto w-full max-w-5xl">
+					{/* Back to Home Button */}
+					<Link 
+						to="/" 
+						className="mb-8 inline-flex items-center gap-2 text-slate-700 transition hover:text-slate-900"
+					>
+						<svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+						</svg>
+						<span className="font-medium">Back to Home</span>
 					</Link>
-					<span className="rounded-full border border-sky-300/40 bg-sky-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-sky-200">
-						Secure Upload
-					</span>
-				</div>
 
-				<div className="w-full rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl shadow-black/30 backdrop-blur-xl">
-					<h1 className="mb-3 text-2xl font-semibold text-white md:text-3xl">
-						Pharmacogenomic Risk Analysis
-					</h1>
-					<p className="mb-6 text-sm text-slate-300 md:text-base">
-						Upload a VCF file and select drugs to generate CPIC-aligned risk predictions.
-					</p>
+					{/* Page Header */}
+					<div className="mb-8">
+						<h1 className="mb-2 text-3xl font-bold text-slate-900 md:text-4xl">
+							Pharmacogenomic Analysis
+						</h1>
+						<p className="text-base text-slate-600 md:text-lg">
+							Upload patient VCF file and select medications for risk assessment
+						</p>
+					</div>
 
+					{/* Error Messages */}
 					{errors.length > 0 && (
-						<div className="mb-4 rounded-xl border border-red-300/30 bg-red-500/10 p-3 text-sm text-red-100">
-							<ul className="list-disc list-inside">
+						<div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4">
+							<ul className="list-disc list-inside text-sm text-red-700">
 								{errors.map((err, i) => (
 									<li key={i}>{err}</li>
 								))}
@@ -112,125 +162,199 @@ export default function UploadPage() {
 						</div>
 					)}
 
-					<form onSubmit={onSubmit} className="space-y-6">
-						<div>
-							<label className="block text-sm font-medium text-slate-200">VCF File</label>
-							<div className="mt-2 rounded-xl border border-white/10 bg-slate-900/50 p-3">
-								<input
-									type="file"
-									accept=".vcf"
-									onChange={onFileChange}
-									className="w-full rounded-md border border-white/15 bg-slate-900 px-3 py-2 text-sm text-slate-200 file:mr-4 file:rounded-full file:border-0 file:bg-sky-500 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-sky-400"
-								/>
-								<p className="mt-2 text-xs text-slate-400">Accepted: .vcf — Max 5MB</p>
-								{file && (
-									<p className="mt-2 text-xs text-sky-200">Selected: {file.name}</p>
-								)}
-							</div>
-						</div>
-
-						<div>
-							<label className="block text-sm font-medium text-slate-200">Select Drugs</label>
-							<div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
-								{DRUG_OPTIONS.map((drug) => (
-									<label
-										key={drug}
-										className={`flex cursor-pointer items-center gap-3 rounded-xl border px-3 py-2 text-sm transition ${
-											selectedDrugs.includes(drug)
-												? 'border-sky-300/60 bg-sky-400/15 text-white'
-												: 'border-white/10 bg-white/5 text-slate-200 hover:border-sky-300/40 hover:bg-white/10'
-										}`}
-									>
-										<input
-											type="checkbox"
-											checked={selectedDrugs.includes(drug)}
-											onChange={() => onDrugToggle(drug)}
-											className="h-4 w-4 rounded border-white/30 bg-slate-900 text-sky-500 focus:ring-sky-500"
-										/>
-										<span className="select-none">{drug}</span>
-									</label>
-								))}
-							</div>
-						</div>
-
-						<div className="flex items-center justify-end gap-3 pt-2">
-							<button
-								type="submit"
-								disabled={submitting}
-								className="inline-flex items-center gap-2 rounded-full bg-sky-500 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-sky-900/50 transition hover:bg-sky-400 disabled:cursor-not-allowed disabled:opacity-60"
-							>
-								{submitting ? 'Analyzing...' : 'Analyze Risk'}
-							</button>
-						</div>
-					</form>
-
-					{/* Results Section */}
-					{results && (
-						<div className="mt-8 space-y-6">
-							<div className="border-t border-white/10 pt-6">
-								<h2 className="mb-4 text-xl font-semibold text-white">Analysis Results</h2>
-								<div className="space-y-4">
-									{results.analyses?.map((analysis, idx) => (
-										<div key={idx} className="rounded-xl border border-white/10 bg-slate-900/50 p-5">
-											{analysis.error ? (
-												<div className="text-red-300">
-													<p className="font-semibold">Error analyzing {analysis.drug || 'drug'}</p>
-													<p className="text-sm">{analysis.error}</p>
-												</div>
-											) : (
-												<div className="space-y-3">
-													<div className="flex items-center justify-between">
-														<h3 className="text-lg font-semibold text-white">{analysis.drug}</h3>
-														<span className={`rounded-full px-3 py-1 text-xs font-semibold uppercase ${
-															analysis.risk_assessment?.risk_label === 'High Risk' ? 'bg-red-500/20 text-red-200 border border-red-500/40' :
-															analysis.risk_assessment?.risk_label === 'Moderate Risk' ? 'bg-yellow-500/20 text-yellow-200 border border-yellow-500/40' :
-															'bg-green-500/20 text-green-200 border border-green-500/40'
-														}`}>
-															{analysis.risk_assessment?.risk_label || 'Unknown'}
-														</span>
-													</div>
-													
-													<div className="space-y-2 text-sm">
-														<div className="grid grid-cols-2 gap-2">
-															<div>
-																<span className="text-slate-400">Primary Gene:</span>
-																<span className="ml-2 text-white font-medium">{analysis.pharmacogenomic_profile?.primary_gene || 'N/A'}</span>
-															</div>
-															<div>
-																<span className="text-slate-400">Phenotype:</span>
-																<span className="ml-2 text-white font-medium">{analysis.pharmacogenomic_profile?.phenotype || 'N/A'}</span>
-															</div>
-														</div>
-														
-														{analysis.clinical_recommendation && (
-															<div className="mt-3 rounded-lg bg-blue-500/10 border border-blue-500/30 p-3">
-																<p className="text-xs font-semibold text-blue-200 mb-1">Clinical Recommendation</p>
-																<p className="text-sm text-slate-200">{analysis.clinical_recommendation}</p>
-															</div>
-														)}
-														
-														{analysis.llm_explanation && (
-															<div className="mt-3 rounded-lg bg-slate-800/50 border border-white/10 p-3">
-																<p className="text-xs font-semibold text-slate-300 mb-1">AI Explanation</p>
-																<p className="text-sm text-slate-200 whitespace-pre-wrap">{analysis.llm_explanation}</p>
-															</div>
-														)}
-													</div>
-												</div>
-											)}
-										</div>
-									))}
-								</div>
+					<form onSubmit={onSubmit} className="space-y-8">
+					{/* Section 1: Upload VCF File */}
+					<div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+						<h2 className="mb-6 text-xl font-semibold text-slate-900">1. Upload VCF File</h2>
+						
+						<div
+							className={`relative rounded-xl border-2 border-dashed p-12 text-center transition-colors ${
+								dragActive
+									? 'border-blue-500 bg-blue-50'
+									: 'border-slate-300 bg-slate-50 hover:border-slate-400'
+							}`}
+							onDragEnter={handleDrag}
+							onDragLeave={handleDrag}
+							onDragOver={handleDrag}
+							onDrop={handleDrop}
+						>
+							<input
+								id="file-upload"
+								type="file"
+								accept=".vcf"
+								onChange={onFileChange}
+								className="hidden"
+							/>
+							
+							<div className="flex flex-col items-center gap-4">
+								{/* Upload Icon */}
+								<svg className="h-16 w-16 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+								</svg>
 								
-								{results.patient_id && (
-									<div className="mt-4 text-xs text-slate-400">
-										<p>Patient ID: {results.patient_id}</p>
-										<p>Analysis Time: {new Date(results.timestamp).toLocaleString()}</p>
+								{file ? (
+									<div className="text-center">
+										<p className="text-base font-medium text-slate-900">Selected: {file.name}</p>
+										<p className="text-sm text-slate-500">
+											{(file.size / 1024).toFixed(1)} KB
+										</p>
+									</div>
+								) : (
+									<div className="text-center">
+										<p className="text-base font-medium text-slate-700">
+											Drag and drop your VCF file here
+										</p>
+										<p className="mt-1 text-sm text-slate-500">or click to browse</p>
 									</div>
 								)}
+								
+								<label
+									htmlFor="file-upload"
+									className="cursor-pointer rounded-lg border border-slate-300 bg-white px-6 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50"
+								>
+									Select File
+								</label>
+								
+								<p className="text-xs text-slate-500">VCF v4.2 format • Max 5 MB</p>
 							</div>
 						</div>
-					)}
+					</div>
+
+					{/* Section 2: Select Medications */}
+					<div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+						<h2 className="mb-6 text-xl font-semibold text-slate-900">2. Select Medications</h2>
+						
+						<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+							{DRUG_OPTIONS.map((drug) => (
+								<button
+									key={drug}
+									type="button"
+									onClick={() => onDrugToggle(drug)}
+									className={`rounded-xl border-2 p-6 text-center text-base font-semibold transition-all ${
+										selectedDrugs.includes(drug)
+											? 'border-blue-500 bg-blue-50 text-blue-700 shadow-sm'
+											: 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50'
+									}`}
+								>
+									{drug.toUpperCase()}
+								</button>
+							))}
+						</div>
+
+						{/* Custom Drug Input */}
+						<div className="mt-6 flex gap-2">
+							<input
+								type="text"
+								value={customDrug}
+								onChange={(e) => setCustomDrug(e.target.value)}
+								onKeyPress={(e) => {
+									if (e.key === 'Enter') {
+										e.preventDefault()
+										handleAddCustomDrug()
+									}
+								}}
+								placeholder="Or enter custom drug name..."
+								className="flex-1 rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-700 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+							/>
+							<button
+								type="button"
+								onClick={handleAddCustomDrug}
+								className="rounded-lg border border-slate-300 bg-white px-6 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+							>
+								Add
+							</button>
+						</div>
+					</div>
+
+					{/* Submit Button */}
+					<div className="flex items-center justify-end gap-3">
+						<button
+							type="submit"
+							disabled={submitting}
+							className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-3 text-base font-semibold text-white shadow-lg shadow-blue-500/30 transition hover:shadow-xl hover:shadow-blue-500/40 disabled:cursor-not-allowed disabled:opacity-60"
+						>
+							{submitting ? (
+								<>
+									<svg className="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">
+										<circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+										<path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+									</svg>
+									Analyzing...
+								</>
+							) : (
+								'Start Analysis'
+							)}
+						</button>
+					</div>
+				</form>
+
+				{/* Results Section */}
+				{results && (
+					<div className="mt-8 space-y-6">
+						<div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+							<h2 className="mb-6 text-2xl font-bold text-slate-900">Analysis Results</h2>
+							<div className="space-y-4">
+								{results.analyses?.map((analysis, idx) => (
+									<div key={idx} className="rounded-xl border border-slate-200 bg-slate-50 p-6">
+										{analysis.error ? (
+											<div className="text-red-700">
+												<p className="font-semibold">Error analyzing {analysis.drug || 'drug'}</p>
+												<p className="text-sm">{analysis.error}</p>
+											</div>
+										) : (
+											<div className="space-y-3">
+												<div className="flex items-center justify-between">
+													<h3 className="text-lg font-semibold text-slate-900">{analysis.drug}</h3>
+													<span className={`rounded-full px-3 py-1 text-xs font-semibold uppercase ${
+														analysis.risk_assessment?.risk_label === 'High Risk' ? 'bg-red-100 text-red-700 border border-red-300' :
+														analysis.risk_assessment?.risk_label === 'Moderate Risk' ? 'bg-yellow-100 text-yellow-700 border border-yellow-300' :
+														'bg-green-100 text-green-700 border border-green-300'
+													}`}>
+														{analysis.risk_assessment?.risk_label || 'Unknown'}
+													</span>
+												</div>
+												
+												<div className="space-y-2 text-sm">
+													<div className="grid grid-cols-2 gap-2">
+														<div>
+															<span className="text-slate-600">Primary Gene:</span>
+															<span className="ml-2 text-slate-900 font-medium">{analysis.pharmacogenomic_profile?.primary_gene || 'N/A'}</span>
+														</div>
+														<div>
+															<span className="text-slate-600">Phenotype:</span>
+															<span className="ml-2 text-slate-900 font-medium">{analysis.pharmacogenomic_profile?.phenotype || 'N/A'}</span>
+														</div>
+													</div>
+													
+													{analysis.clinical_recommendation && (
+														<div className="mt-3 rounded-lg bg-blue-50 border border-blue-200 p-3">
+															<p className="text-xs font-semibold text-blue-900 mb-1">Clinical Recommendation</p>
+															<p className="text-sm text-slate-700">{analysis.clinical_recommendation}</p>
+														</div>
+													)}
+													
+													{analysis.llm_explanation && (
+														<div className="mt-3 rounded-lg bg-slate-100 border border-slate-200 p-3">
+															<p className="text-xs font-semibold text-slate-900 mb-1">AI Explanation</p>
+															<p className="text-sm text-slate-700 whitespace-pre-wrap">{analysis.llm_explanation}</p>
+														</div>
+													)}
+												</div>
+											</div>
+										)}
+									</div>
+								))}
+							</div>
+							
+							{results.patient_id && (
+								<div className="mt-6 text-xs text-slate-500">
+									<p>Patient ID: {results.patient_id}</p>
+									<p>Analysis Time: {new Date(results.timestamp).toLocaleString()}</p>
+								</div>
+							)}
+						</div>
+					</div>
+				)}
 				</div>
 			</div>
 		</div>

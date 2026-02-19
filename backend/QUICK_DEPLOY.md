@@ -1,6 +1,7 @@
 # 🚀 Quick Deployment Reference
 
 ## Pre-Deployment Checklist
+
 - [ ] MongoDB Atlas cluster created and configured
 - [ ] OpenAI API key obtained
 - [ ] Groq API key obtained
@@ -16,6 +17,7 @@
    - Render auto-detects `render.yaml`
 
 2. **Set Environment Variables** (Go to Environment tab)
+
    ```
    JWT_SECRET_KEY        → [Auto-generate]
    OPENAI_API_KEY        → sk-...
@@ -30,6 +32,7 @@
    - Your API URL: `https://your-app-name.onrender.com`
 
 ## Test Deployment
+
 ```bash
 curl https://your-app-name.onrender.com/health
 
@@ -38,18 +41,20 @@ curl https://your-app-name.onrender.com/health
 ```
 
 ## Update Frontend
+
 Replace `http://localhost:5000` with `https://your-app-name.onrender.com`
 
 ## Common Issues
 
-| Issue | Solution |
-|-------|----------|
-| Build fails | Check all dependencies in requirements.txt |
-| 500 errors | Verify environment variables are set |
-| CORS errors | Update FRONTEND_URL to match your frontend |
-| DB connection fails | Check MongoDB whitelist (0.0.0.0/0) |
+| Issue               | Solution                                   |
+| ------------------- | ------------------------------------------ |
+| Build fails         | Check all dependencies in requirements.txt |
+| 500 errors          | Verify environment variables are set       |
+| CORS errors         | Update FRONTEND_URL to match your frontend |
+| DB connection fails | Check MongoDB whitelist (0.0.0.0/0)        |
 
 ## Files Modified
+
 - ✅ `app.py` - Added CORS + production config
 - ✅ `requirements.txt` - Added flask-cors + gunicorn
 - ✅ `render.yaml` - NEW deployment config
@@ -57,5 +62,6 @@ Replace `http://localhost:5000` with `https://your-app-name.onrender.com`
 - ✅ `RENDER_DEPLOYMENT.md` - NEW full guide
 
 ## Support
+
 Full documentation: `RENDER_DEPLOYMENT.md`
 Changes summary: `DEPLOYMENT_CHANGES.md`

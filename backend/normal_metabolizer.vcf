@@ -1,0 +1,18 @@
+##fileformat=VCFv4.1
+##fileDate=20260219
+##source=NormalMetabolizer_TestVCF
+##reference=GRCh37/hg19
+##contig=<ID=1,length=249250621>
+##contig=<ID=6,length=171115067>
+##contig=<ID=10,length=135534747>
+##contig=<ID=12,length=133851895>
+##contig=<ID=22,length=51015098>
+##INFO=<ID=DP,Number=1,Type=Integer,Description="Total Depth">
+##INFO=<ID=AF,Number=A,Type=Float,Description="Allele Frequency">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##FORMAT=<ID=GQ,Number=1,Type=Integer,Description="Genotype Quality">
+##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Depth">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	normal_patient
+22	42130000	rs9999999	C	T	90	PASS	DP=40;AF=0.0	GT:GQ:DP	0/0:90:40
+10	96530000	rs8888888	G	A	85	PASS	DP=35;AF=0.0	GT:GQ:DP	0/0:85:35
+10	94950000	rs7777777	A	C	88	PASS	DP=42;AF=0.0	GT:GQ:DP	0/0:88:42

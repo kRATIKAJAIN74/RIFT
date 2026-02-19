@@ -14,6 +14,7 @@ export default function UploadPage() {
 	const [selectedDrugs, setSelectedDrugs] = useState([])
 	const [errors, setErrors] = useState([])
 	const [submitting, setSubmitting] = useState(false)
+	const [results, setResults] = useState(null)
 
 	const validate = () => {
 		const errs = []
@@ -44,15 +45,33 @@ export default function UploadPage() {
 		e.preventDefault()
 		if (!validate()) return
 		setSubmitting(true)
+		setErrors([])
+		setResults(null)
+		
 		try {
-			// Placeholder: replace with real upload endpoint
-			await new Promise((r) => setTimeout(r, 900))
-			alert('File validated and submitted for analysis.')
+			// Create FormData to send file and drugs
+			const formData = new FormData()
+			formData.append('file', file)
+			formData.append('drug', JSON.stringify(selectedDrugs))
+			
+			// Call backend API
+			const response = await fetch('http://localhost:5000/analyze', {
+				method: 'POST',
+				body: formData,
+			})
+			
+			const data = await response.json()
+			
+			if (!response.ok) {
+				throw new Error(data.error || 'Analysis failed')
+			}
+			
+			// Store results and show success
+			setResults(data)
 			setFile(null)
 			setSelectedDrugs([])
-			setErrors([])
 		} catch (err) {
-			setErrors(['Submission failed — please try again.'])
+			setErrors([err.message || 'Submission failed — please try again.'])
 		} finally {
 			setSubmitting(false)
 		}
@@ -144,6 +163,74 @@ export default function UploadPage() {
 							</button>
 						</div>
 					</form>
+
+					{/* Results Section */}
+					{results && (
+						<div className="mt-8 space-y-6">
+							<div className="border-t border-white/10 pt-6">
+								<h2 className="mb-4 text-xl font-semibold text-white">Analysis Results</h2>
+								<div className="space-y-4">
+									{results.analyses?.map((analysis, idx) => (
+										<div key={idx} className="rounded-xl border border-white/10 bg-slate-900/50 p-5">
+											{analysis.error ? (
+												<div className="text-red-300">
+													<p className="font-semibold">Error analyzing {analysis.drug || 'drug'}</p>
+													<p className="text-sm">{analysis.error}</p>
+												</div>
+											) : (
+												<div className="space-y-3">
+													<div className="flex items-center justify-between">
+														<h3 className="text-lg font-semibold text-white">{analysis.drug}</h3>
+														<span className={`rounded-full px-3 py-1 text-xs font-semibold uppercase ${
+															analysis.risk_assessment?.risk_label === 'High Risk' ? 'bg-red-500/20 text-red-200 border border-red-500/40' :
+															analysis.risk_assessment?.risk_label === 'Moderate Risk' ? 'bg-yellow-500/20 text-yellow-200 border border-yellow-500/40' :
+															'bg-green-500/20 text-green-200 border border-green-500/40'
+														}`}>
+															{analysis.risk_assessment?.risk_label || 'Unknown'}
+														</span>
+													</div>
+													
+													<div className="space-y-2 text-sm">
+														<div className="grid grid-cols-2 gap-2">
+															<div>
+																<span className="text-slate-400">Primary Gene:</span>
+																<span className="ml-2 text-white font-medium">{analysis.pharmacogenomic_profile?.primary_gene || 'N/A'}</span>
+															</div>
+															<div>
+																<span className="text-slate-400">Phenotype:</span>
+																<span className="ml-2 text-white font-medium">{analysis.pharmacogenomic_profile?.phenotype || 'N/A'}</span>
+															</div>
+														</div>
+														
+														{analysis.clinical_recommendation && (
+															<div className="mt-3 rounded-lg bg-blue-500/10 border border-blue-500/30 p-3">
+																<p className="text-xs font-semibold text-blue-200 mb-1">Clinical Recommendation</p>
+																<p className="text-sm text-slate-200">{analysis.clinical_recommendation}</p>
+															</div>
+														)}
+														
+														{analysis.llm_explanation && (
+															<div className="mt-3 rounded-lg bg-slate-800/50 border border-white/10 p-3">
+																<p className="text-xs font-semibold text-slate-300 mb-1">AI Explanation</p>
+																<p className="text-sm text-slate-200 whitespace-pre-wrap">{analysis.llm_explanation}</p>
+															</div>
+														)}
+													</div>
+												</div>
+											)}
+										</div>
+									))}
+								</div>
+								
+								{results.patient_id && (
+									<div className="mt-4 text-xs text-slate-400">
+										<p>Patient ID: {results.patient_id}</p>
+										<p>Analysis Time: {new Date(results.timestamp).toLocaleString()}</p>
+									</div>
+								)}
+							</div>
+						</div>
+					)}
 				</div>
 			</div>
 		</div>

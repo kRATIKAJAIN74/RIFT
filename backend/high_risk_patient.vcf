@@ -1,0 +1,21 @@
+##fileformat=VCFv4.1
+##fileDate=20260219
+##source=HighRisk_TestVCF
+##reference=GRCh37/hg19
+##contig=<ID=1,length=249250621>
+##contig=<ID=6,length=171115067>
+##contig=<ID=10,length=135534747>
+##contig=<ID=12,length=133851895>
+##contig=<ID=22,length=51015098>
+##INFO=<ID=DP,Number=1,Type=Integer,Description="Total Depth">
+##INFO=<ID=AF,Number=A,Type=Float,Description="Allele Frequency">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##FORMAT=<ID=GQ,Number=1,Type=Integer,Description="Genotype Quality">
+##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Depth">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	high_risk_patient
+22	42126499	rs28371725	A	G	100	PASS	DP=60;AF=1.0	GT:GQ:DP	1/1:99:60
+10	96522463	rs28399499	C	T	100	PASS	DP=58;AF=1.0	GT:GQ:DP	1/1:99:58
+10	94942858	rs1799853	C	T	100	PASS	DP=65;AF=1.0	GT:GQ:DP	1/1:99:65
+10	94981296	rs1057910	A	C	97	PASS	DP=60;AF=1.0	GT:GQ:DP	1/1:98:60
+6	18139228	rs1800462	C	G	95	PASS	DP=50;AF=1.0	GT:GQ:DP	1/1:96:50
+1	97915614	rs75017182	C	T	100	PASS	DP=68;AF=1.0	GT:GQ:DP	1/1:99:68

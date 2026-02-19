@@ -174,16 +174,105 @@ class PharmacogenomicsAnalyzer:
         if not variants:
             return 'Unknown', 'Unknown'
         
-        # Count allele types based on variants
-        alt_count = sum(1 for v in variants if '1' in v.get('genotype', '0/0'))
+        # Map rsIDs to known star alleles for better accuracy
+        rsid_to_allele = {
+            # CYP2D6
+            'rs28371725': '*4',  # Loss of function
+            'rs3892097': '*4',
+            'rs1065852': '*10',  # Reduced function
+            # CYP2C19  
+            'rs28399504': '*2',  # Loss of function
+            'rs4244285': '*2',
+            'rs12248560': '*17', # Increased function
+            'rs28399499': '*2',  # Loss of function
+            # CYP2C9
+            'rs1799853': '*2',   # Reduced function
+            'rs1057910': '*3',   # Reduced function
+            # SLCO1B1
+            'rs4149056': '*5',   # Reduced function
+            # TPMT
+            'rs1800462': '*2',   # Reduced function
+            'rs1800460': '*3A',  # Reduced function  
+            'rs1142345': '*3C',  # Reduced function
+            # DPYD
+            'rs75017182': '*2A',  # Loss of function
+            'rs67376798': '*13'   # Reduced function
+        }
         
-        # Simplified diplotype inference logic
-        if alt_count == 0:
-            diplotype = '*1/*1'
-        elif alt_count == 1:
-            diplotype = '*1/*2'
+        # Analyze genotypes to infer diplotype
+        alleles = []
+        has_no_function_alleles = 0
+        has_reduced_function_alleles = 0
+        
+        for variant in variants:
+            rsid = variant.get('rsid', '')
+            genotype = variant.get('genotype', '0/0')
+            
+            # Parse genotype
+            if '/' in genotype:
+                gt_parts = genotype.split('/')
+            elif '|' in genotype:
+                gt_parts = genotype.split('|')
+            else:
+                continue
+            
+            # Check if variant causes functional changes
+            if rsid in rsid_to_allele:
+                allele = rsid_to_allele[rsid]
+                
+                # Count functional impact based on zygosity
+                if gt_parts[0] == '1' or gt_parts[1] == '1':
+                    # At least one alternate allele
+                    if allele in ['*2', '*3', '*4', '*5', '*2A']:
+                        if gt_parts[0] == '1' and gt_parts[1] == '1':
+                            # Homozygous - both alleles affected
+                            has_no_function_alleles += 2
+                        else:
+                            # Heterozygous - one allele affected
+                            has_no_function_alleles += 1
+                    else:
+                        if gt_parts[0] == '1' and gt_parts[1] == '1':
+                            has_reduced_function_alleles += 2
+                        else:
+                            has_reduced_function_alleles += 1
+        
+        # Infer diplotype based on functional allele counts
+        if has_no_function_alleles >= 2:
+            # Two loss-of-function alleles
+            if gene == 'SLCO1B1':
+                diplotype = '*5/*5'
+            elif gene == 'TPMT':
+                diplotype = '*3/*3'
+            elif gene == 'DPYD':
+                diplotype = 'Homozygous'
+            else:
+                diplotype = '*2/*2'
+        elif has_no_function_alleles == 1:
+            # One loss-of-function, one normal
+            if gene == 'SLCO1B1':
+                diplotype = '*1a/*5'
+            elif gene == 'TPMT':
+                diplotype = '*1/*3'
+            elif gene == 'DPYD':
+                diplotype = 'Heterozygous'
+            else:
+                diplotype = '*1/*2'
+        elif has_reduced_function_alleles >= 1:
+            # At least one reduced function
+            if gene == 'SLCO1B1':
+                diplotype = '*1b/*1b'
+            elif gene == 'DPYD':
+                diplotype = 'Heterozygous'
+            else:
+                diplotype = '*1/*3'
         else:
-            diplotype = '*2/*2'
+            # No significant variants - normal
+            if gene == 'SLCO1B1':
+                diplotype = '*1a/*1a'
+            elif gene == 'DPYD':
+                diplotype = 'Normal'
+            else:
+                diplotype = '*1/*1'
         
         # Look up phenotype from CPIC data
         if gene in self.cpic_data:
@@ -223,6 +312,11 @@ class PharmacogenomicsAnalyzer:
                 'confidence': 0.85,
                 'severity': 'medium'
             },
+            'Intermediate Activity': {
+                'risk_label': 'Adjust Dosage',
+                'confidence': 0.85,
+                'severity': 'medium'
+            },
             'Reduced': {
                 'risk_label': 'Adjust Dosage',
                 'confidence': 0.85,
@@ -233,10 +327,30 @@ class PharmacogenomicsAnalyzer:
                 'confidence': 0.9,
                 'severity': 'high'
             },
+            'Poor': {
+                'risk_label': 'Toxic',
+                'confidence': 0.9,
+                'severity': 'high'
+            },
+            'Low/Absent Activity': {
+                'risk_label': 'Toxic',
+                'confidence': 0.9,
+                'severity': 'high'
+            },
             'Ultra-Rapid Metabolizer': {
                 'risk_label': 'Ineffective',
                 'confidence': 0.8,
                 'severity': 'medium'
+            },
+            'Normal Activity': {
+                'risk_label': 'Safe',
+                'confidence': 0.95,
+                'severity': 'low'
+            },
+            'Normal': {
+                'risk_label': 'Safe',
+                'confidence': 0.95,
+                'severity': 'low'
             },
             'Unknown': {
                 'risk_label': 'Unknown',

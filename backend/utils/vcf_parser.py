@@ -17,9 +17,9 @@ class VCFParser:
         'CYP2D6': {'chr': '22', 'start': 42126499, 'end': 42135544},
         'CYP2C19': {'chr': '10', 'start': 96522463, 'end': 96541053},
         'CYP2C9': {'chr': '10', 'start': 94942858, 'end': 94987273},
-        'SLCO1B1': {'chr': '12', 'start': 21370000, 'end': 21410000},
+        'SLCO1B1': {'chr': '12', 'start': 21100000, 'end': 21410000},  # Extended to include rs4149056
         'TPMT': {'chr': '6', 'start': 18130000, 'end': 18170000},
-        'DPYD': {'chr': '1', 'start': 97613800, 'end': 98348885}
+        'DPYD': {'chr': '1', 'start': 97500000, 'end': 98348885}  # Extended to include all variants
     }
     
     def __init__(self):

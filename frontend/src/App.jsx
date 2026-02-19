@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import './App.css'
 import { AuthProvider } from './contexts/AuthContext'
+import { ThemeProvider } from './contexts/ThemeContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import LandingPage from './pages/LandingPage'
 import SigninPage from './pages/SigninPage'
@@ -10,21 +11,23 @@ import UploadPage from './pages/UploadPage'
 export default function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/signin" element={<SigninPage />} />
-          <Route path="/signup" element={<SignupPage />} />
-          <Route 
-            path="/upload" 
-            element={
-              <ProtectedRoute>
-                <UploadPage />
-              </ProtectedRoute>
-            } 
-          />
-        </Routes>
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/signin" element={<SigninPage />} />
+            <Route path="/signup" element={<SignupPage />} />
+            <Route 
+              path="/upload" 
+              element={
+                <ProtectedRoute>
+                  <UploadPage />
+                </ProtectedRoute>
+              } 
+            />
+          </Routes>
+        </AuthProvider>
+      </ThemeProvider>
     </BrowserRouter>
   )
 }

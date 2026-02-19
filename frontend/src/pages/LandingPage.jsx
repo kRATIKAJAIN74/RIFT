@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import ThemeToggle from '../components/ThemeToggle'
 
 const LandingPage = () => {
 	const { user, logout } = useAuth()
@@ -19,8 +20,8 @@ const LandingPage = () => {
 	}
 
 	return (
-		<div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
-			<header className="border-b border-slate-100 bg-white/80 backdrop-blur-sm">
+		<div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800">
+			<header className="border-b border-slate-100 bg-white/80 backdrop-blur-sm dark:border-slate-700 dark:bg-slate-900/80">
 				<nav className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-4">
 					<div className="flex items-center gap-3">
 						<div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-purple-600">
@@ -29,27 +30,28 @@ const LandingPage = () => {
 							</svg>
 						</div>
 						<div>
-							<h1 className="text-xl font-bold text-slate-900">PharmaGuard</h1>
-							<p className="text-xs text-slate-600">Pharmacogenomic Risk Prediction</p>
+							<h1 className="text-xl font-bold text-slate-900 dark:text-white">PharmaGuard</h1>
+							<p className="text-xs text-slate-600 dark:text-slate-400">Pharmacogenomic Risk Prediction</p>
 						</div>
 					</div>
 					<div className="flex items-center gap-4">
+						<ThemeToggle />
 						{user ? (
 							<div className="flex items-center gap-4">
-								<div className="px-4 py-2 rounded-lg bg-blue-50 border border-blue-200">
-									<p className="text-sm font-semibold text-blue-900">{user.first_name} {user.last_name}</p>
-									<p className="text-xs text-blue-700">{user.email}</p>
+								<div className="px-4 py-2 rounded-lg bg-blue-50 border border-blue-200 dark:bg-blue-900/30 dark:border-blue-700">
+									<p className="text-sm font-semibold text-blue-900 dark:text-blue-100">{user.first_name} {user.last_name}</p>
+									<p className="text-xs text-blue-700 dark:text-blue-300">{user.email}</p>
 								</div>
 								<button
 									onClick={handleLogout}
-									className="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 font-medium hover:bg-slate-50 transition"
+									className="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 font-medium hover:bg-slate-50 transition dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800"
 								>
 									Logout
 								</button>
 							</div>
 						) : (
 							<div className="flex items-center gap-2">
-								<span className="flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-700">
+								<span className="flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-700 dark:border-blue-700 dark:bg-blue-900/30 dark:text-blue-100">
 									<svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
 										<path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" />
 									</svg>
@@ -63,18 +65,18 @@ const LandingPage = () => {
 
 			<main>
 				<section className="mx-auto flex w-full max-w-7xl flex-col items-center px-6 pb-16 pt-12 text-center md:pb-24 md:pt-16">
-					<div className="mb-8 inline-block rounded-full border border-blue-200 bg-blue-50 px-4 py-1.5 text-sm font-medium text-blue-700">
+					<div className="mb-8 inline-block rounded-full border border-blue-200 bg-blue-50 px-4 py-1.5 text-sm font-medium text-blue-700 dark:border-blue-700 dark:bg-blue-900/30 dark:text-blue-100">
 						RIFT 2026 Hackathon • HealthTech Track
 					</div>
 
-					<h1 className="mb-6 max-w-5xl text-4xl font-bold leading-tight text-slate-900 sm:text-5xl md:text-6xl lg:text-7xl">
+					<h1 className="mb-6 max-w-5xl text-4xl font-bold leading-tight text-slate-900 dark:text-white sm:text-5xl md:text-6xl lg:text-7xl">
 						Preventing Adverse<br />
 						<span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
 							Drug Reactions
 						</span>
 					</h1>
 
-					<p className="mb-10 max-w-3xl text-base leading-relaxed text-slate-600 sm:text-lg md:text-xl">
+					<p className="mb-10 max-w-3xl text-base leading-relaxed text-slate-600 dark:text-slate-300 sm:text-lg md:text-xl">
 						AI-powered pharmacogenomic analysis that predicts drug-specific risks by analyzing genetic variants across 6 critical genes, preventing over 100,000 preventable deaths annually.
 					</p>
 
@@ -89,25 +91,25 @@ const LandingPage = () => {
 					</button>
 
 					<div className="grid w-full max-w-6xl gap-6 sm:grid-cols-2 lg:grid-cols-4">
-						<div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+						<div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800">
 							<p className="text-4xl font-bold text-blue-600">6</p>
-							<p className="mt-2 text-sm font-semibold text-slate-900">Critical Genes</p>
-							<p className="mt-1 text-xs text-slate-500">CYP2D6, CYP2C19, CYP2C9, SLCO1B1, TPMT, DPYD</p>
+							<p className="mt-2 text-sm font-semibold text-slate-900 dark:text-white">Critical Genes</p>
+							<p className="mt-1 text-xs text-slate-500 dark:text-slate-400">CYP2D6, CYP2C19, CYP2C9, SLCO1B1, TPMT, DPYD</p>
 						</div>
-						<div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+						<div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800">
 							<p className="text-4xl font-bold text-purple-600">100K+</p>
-							<p className="mt-2 text-sm font-semibold text-slate-900">Lives at Risk</p>
-							<p className="mt-1 text-xs text-slate-500">Annual ADR deaths in USA</p>
+							<p className="mt-2 text-sm font-semibold text-slate-900 dark:text-white">Lives at Risk</p>
+							<p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Annual ADR deaths in USA</p>
 						</div>
-						<div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+						<div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800">
 							<p className="text-4xl font-bold text-green-600">98%</p>
-							<p className="mt-2 text-sm font-semibold text-slate-900">Accuracy</p>
-							<p className="mt-1 text-xs text-slate-500">VCF parsing success rate</p>
+							<p className="mt-2 text-sm font-semibold text-slate-900 dark:text-white">Accuracy</p>
+							<p className="mt-1 text-xs text-slate-500 dark:text-slate-400">VCF parsing success rate</p>
 						</div>
-						<div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+						<div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800">
 							<p className="text-4xl font-bold text-orange-600">5s</p>
-							<p className="mt-2 text-sm font-semibold text-slate-900">Analysis Time</p>
-							<p className="mt-1 text-xs text-slate-500">Real-time predictions</p>
+							<p className="mt-2 text-sm font-semibold text-slate-900 dark:text-white">Analysis Time</p>
+							<p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Real-time predictions</p>
 						</div>
 					</div>
 				</section>

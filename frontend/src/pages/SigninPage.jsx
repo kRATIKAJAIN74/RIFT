@@ -36,7 +36,7 @@ export default function SigninPage() {
 	}
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center px-4">
+		<div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center px-4">
 			<div className="w-full max-w-md">
 				{/* Header */}
 				<div className="text-center mb-8">
@@ -47,16 +47,16 @@ export default function SigninPage() {
 							</svg>
 						</div>
 					</div>
-					<h1 className="text-3xl font-bold text-slate-900 mb-2">PharmaGuard</h1>
-					<p className="text-slate-600">Sign in to your account</p>
+					<h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">PharmaGuard</h1>
+					<p className="text-slate-600 dark:text-slate-400">Sign in to your account</p>
 				</div>
 
 				{/* Card */}
-				<div className="bg-white rounded-2xl shadow-lg p-8 border border-slate-200">
+				<div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-8 border border-slate-200 dark:border-slate-700">
 					{/* Error Messages */}
 					{errors.length > 0 && (
-						<div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4">
-							<ul className="list-disc list-inside text-sm text-red-700">
+						<div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-900/50 dark:bg-red-900/20">
+							<ul className="list-disc list-inside text-sm text-red-700 dark:text-red-300">
 								{errors.map((err, i) => (
 									<li key={i}>{err}</li>
 								))}
@@ -67,7 +67,7 @@ export default function SigninPage() {
 					<form onSubmit={onSubmit} className="space-y-4">
 						{/* Email */}
 						<div>
-							<label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-2">
+							<label htmlFor="email" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
 								Email Address
 							</label>
 							<input
@@ -75,7 +75,7 @@ export default function SigninPage() {
 								type="email"
 								value={email}
 								onChange={(e) => setEmail(e.target.value)}
-								className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+								className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder:text-slate-400"
 								placeholder="you@example.com"
 								disabled={submitting}
 							/>
@@ -83,7 +83,7 @@ export default function SigninPage() {
 
 						{/* Password */}
 						<div>
-							<label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-2">
+							<label htmlFor="password" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
 								Password
 							</label>
 							<input
@@ -91,7 +91,7 @@ export default function SigninPage() {
 								type="password"
 								value={password}
 								onChange={(e) => setPassword(e.target.value)}
-								className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+								className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder:text-slate-400"
 								placeholder="••••••••"
 								disabled={submitting}
 							/>
@@ -109,15 +109,15 @@ export default function SigninPage() {
 
 					{/* Divider */}
 					<div className="my-6 flex items-center">
-						<div className="flex-1 border-t border-slate-300"></div>
-						<span className="px-3 text-sm text-slate-500">or</span>
-						<div className="flex-1 border-t border-slate-300"></div>
+						<div className="flex-1 border-t border-slate-300 dark:border-slate-600"></div>
+						<span className="px-3 text-sm text-slate-500 dark:text-slate-400">or</span>
+						<div className="flex-1 border-t border-slate-300 dark:border-slate-600"></div>
 					</div>
 
 					{/* Sign Up Link */}
-					<p className="text-center text-slate-600">
+					<p className="text-center text-slate-600 dark:text-slate-400">
 						Don't have an account?{' '}
-						<Link to="/signup" className="text-blue-600 font-semibold hover:text-blue-700">
+						<Link to="/signup" className="text-blue-600 dark:text-blue-400 font-semibold hover:text-blue-700 dark:hover:text-blue-300">
 							Sign Up
 						</Link>
 					</p>

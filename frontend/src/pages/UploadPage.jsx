@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '../contexts/AuthContext'
 
 const DRUG_OPTIONS = [
 	'Codeine',
@@ -18,6 +19,14 @@ export default function UploadPage() {
 	const [results, setResults] = useState(null)
 	const [dragActive, setDragActive] = useState(false)
 	const [customDrug, setCustomDrug] = useState('')
+	const [showAssistant, setShowAssistant] = useState(false)
+	const { user, token, logout } = useAuth()
+	const navigate = useNavigate()
+
+	const handleLogout = () => {
+		logout()
+		navigate('/')
+	}
 
 	const validate = () => {
 		const errs = []
@@ -90,9 +99,12 @@ export default function UploadPage() {
 			formData.append('file', file)
 			formData.append('drug', JSON.stringify(selectedDrugs))
 			
-			// Call backend API
+			// Call backend API with JWT token
 			const response = await fetch('http://localhost:5000/analyze', {
 				method: 'POST',
+				headers: {
+					'Authorization': `Bearer ${token}`
+				},
 				body: formData,
 			})
 			
@@ -130,16 +142,33 @@ export default function UploadPage() {
 			{/* Content Overlay */}
 			<div className="relative z-10 min-h-screen bg-gradient-to-b from-slate-50/80 to-white/80 px-4 py-8 backdrop-blur-sm overflow-x-hidden">
 				<div className="mx-auto w-full max-w-5xl">
-					{/* Back to Home Button */}
-					<Link 
-						to="/" 
-						className="mb-8 inline-flex items-center gap-2 text-slate-700 transition hover:text-slate-900"
-					>
-						<svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-						</svg>
-						<span className="font-medium">Back to Home</span>
-					</Link>
+					{/* Top Navigation */}
+					<div className="mb-8 flex items-center justify-between">
+						<Link 
+							to="/" 
+							className="inline-flex items-center gap-2 text-slate-700 transition hover:text-slate-900"
+						>
+							<svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+							</svg>
+							<span className="font-medium">Back to Home</span>
+						</Link>
+
+						{user && (
+							<div className="flex items-center gap-4">
+								<div className="px-3 py-2 rounded-lg bg-blue-50 border border-blue-200 text-right">
+									<p className="text-sm font-semibold text-blue-900">{user.first_name} {user.last_name}</p>
+									<p className="text-xs text-blue-700">{user.email}</p>
+								</div>
+								<button
+									onClick={handleLogout}
+									className="px-3 py-2 rounded-lg border border-slate-300 text-slate-700 text-sm font-medium hover:bg-slate-100 transition"
+								>
+									Logout
+								</button>
+							</div>
+						)}
+					</div>
 
 					{/* Page Header */}
 					<div className="mb-8">
@@ -357,6 +386,69 @@ export default function UploadPage() {
 				)}
 				</div>
 			</div>
+
+			{/* Floating Ask Assistant Button */}
+			<button
+				onClick={() => setShowAssistant(!showAssistant)}
+				className="fixed bottom-8 right-8 z-50 p-4 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-500/40 hover:shadow-xl hover:shadow-blue-500/60 transition-all duration-300 hover:scale-110 flex items-center justify-center group"
+				title="Ask Assistant"
+			>
+				<svg className="h-6 w-6 group-hover:rotate-12 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+					<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+				</svg>
+			</button>
+
+			{/* Assistant Panel */}
+			{showAssistant && (
+				<div className="fixed bottom-24 right-8 z-50 w-96 bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+					{/* Header */}
+					<div className="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-4 flex items-center justify-between">
+						<div className="flex items-center gap-2">
+							<div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+								<svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+								</svg>
+							</div>
+							<h3 className="text-white font-semibold">PharmaGuard Assistant</h3>
+						</div>
+						<button
+							onClick={() => setShowAssistant(false)}
+							className="text-white/80 hover:text-white transition"
+						>
+							<svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+							</svg>
+						</button>
+					</div>
+
+					{/* Content */}
+					<div className="p-6">
+						<p className="text-slate-600 text-sm mb-4">
+							Hello! I'm here to help you with your pharmacogenomic analysis. How can I assist you today?
+						</p>
+						
+						<div className="space-y-2">
+							<button className="w-full text-left px-4 py-3 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 text-sm font-medium transition border border-blue-200">
+								💊 Help with uploading VCF file
+							</button>
+							<button className="w-full text-left px-4 py-3 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-700 text-sm font-medium transition border border-purple-200">
+								🧬 Understand the analysis
+							</button>
+							<button className="w-full text-left px-4 py-3 rounded-lg bg-green-50 hover:bg-green-100 text-green-700 text-sm font-medium transition border border-green-200">
+								⚠️ Risk levels explanation
+							</button>
+							<button className="w-full text-left px-4 py-3 rounded-lg bg-orange-50 hover:bg-orange-100 text-orange-700 text-sm font-medium transition border border-orange-200">
+								❓ Ask a question
+							</button>
+						</div>
+					</div>
+
+					{/* Footer */}
+					<div className="border-t border-slate-200 px-6 py-3 bg-slate-50 text-xs text-slate-500 text-center">
+						Powered by PharmaGuard AI
+					</div>
+				</div>
+			)}
 		</div>
 	)
 }

@@ -1,6 +1,23 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '../contexts/AuthContext'
 
 const LandingPage = () => {
+	const { user, logout } = useAuth()
+	const navigate = useNavigate()
+
+	const handleAnalysisClick = () => {
+		if (!user) {
+			navigate('/signin')
+		} else {
+			navigate('/upload')
+		}
+	}
+
+	const handleLogout = () => {
+		logout()
+		navigate('/')
+	}
+
 	return (
 		<div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
 			<header className="border-b border-slate-100 bg-white/80 backdrop-blur-sm">
@@ -16,13 +33,30 @@ const LandingPage = () => {
 							<p className="text-xs text-slate-600">Pharmacogenomic Risk Prediction</p>
 						</div>
 					</div>
-					<div className="flex items-center gap-2">
-						<span className="flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-700">
-							<svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-								<path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" />
-							</svg>
-							RIFT 2026
-						</span>
+					<div className="flex items-center gap-4">
+						{user ? (
+							<div className="flex items-center gap-4">
+								<div className="px-4 py-2 rounded-lg bg-blue-50 border border-blue-200">
+									<p className="text-sm font-semibold text-blue-900">{user.first_name} {user.last_name}</p>
+									<p className="text-xs text-blue-700">{user.email}</p>
+								</div>
+								<button
+									onClick={handleLogout}
+									className="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 font-medium hover:bg-slate-50 transition"
+								>
+									Logout
+								</button>
+							</div>
+						) : (
+							<div className="flex items-center gap-2">
+								<span className="flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-700">
+									<svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+										<path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" />
+									</svg>
+									RIFT 2026
+								</span>
+							</div>
+						)}
 					</div>
 				</nav>
 			</header>
@@ -44,15 +78,15 @@ const LandingPage = () => {
 						AI-powered pharmacogenomic analysis that predicts drug-specific risks by analyzing genetic variants across 6 critical genes, preventing over 100,000 preventable deaths annually.
 					</p>
 
-					<Link 
-						to="/upload" 
+					<button
+						onClick={handleAnalysisClick}
 						className="group mb-16 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-4 text-base font-semibold text-white shadow-lg shadow-blue-500/30 transition hover:shadow-xl hover:shadow-blue-500/40"
 					>
-						Start Analysis
+						{user ? 'Continue to Analysis' : 'Start Analysis'}
 						<svg className="h-5 w-5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
 						</svg>
-					</Link>
+					</button>
 
 					<div className="grid w-full max-w-6xl gap-6 sm:grid-cols-2 lg:grid-cols-4">
 						<div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">

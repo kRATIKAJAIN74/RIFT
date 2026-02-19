@@ -5,21 +5,28 @@ Analyzes VCF files and predicts drug response risks based on genetic profiles
 
 import json
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from functools import wraps
 from flask import Flask, request, jsonify
 from werkzeug.utils import secure_filename
 import os
 from dotenv import load_dotenv
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 
 from utils.vcf_parser import VCFParser
 from utils.pharmacogenomics import PharmacogenomicsAnalyzer
 from utils.openai_integration import OpenAIExplainer
+from utils.auth import UserManager
 
 # Load environment variables
 load_dotenv()
 
 app = Flask(__name__)
+
+# JWT Configuration
+app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'your-secret-key-change-in-production')
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=30)
+jwt = JWTManager(app)
 
 # Configuration
 MAX_FILE_SIZE = 5 * 1024 * 1024  # 5 MB
@@ -32,11 +39,16 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = MAX_FILE_SIZE
 
 # Enable CORS for frontend
+@app.before_request
+def handle_preflight():
+    if request.method == 'OPTIONS':
+        return '', 204
+
 @app.after_request
 def after_request(response):
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Authorization'
+    response.headers['Access-Control-Allow-Methods'] = 'GET,PUT,POST,DELETE,OPTIONS'
     return response
 
 # Initialize components
@@ -100,11 +112,143 @@ def health_check():
     }), 200
 
 
+@app.route('/auth/signup', methods=['POST'])
+def signup():
+    """
+    Register a new user
+    
+    Expected request body (JSON):
+    {
+        "email": "user@example.com",
+        "password": "password123",
+        "first_name": "John",
+        "last_name": "Doe"
+    }
+    """
+    try:
+        data = request.get_json()
+        print(f"[SIGNUP] Request received for email: {data.get('email')}")
+        
+        # Validate input
+        required_fields = ['email', 'password', 'first_name', 'last_name']
+        for field in required_fields:
+            if field not in data or not data[field]:
+                print(f"[SIGNUP] Validation failed: {field} is required")
+                return jsonify({'error': f'{field} is required'}), 400
+        
+        # Validate email format
+        if '@' not in data['email'] or '.' not in data['email']:
+            print(f"[SIGNUP] Invalid email format: {data['email']}")
+            return jsonify({'error': 'Invalid email format'}), 400
+        
+        # Validate password length
+        if len(data['password']) < 6:
+            print(f"[SIGNUP] Password too short for: {data['email']}")
+            return jsonify({'error': 'Password must be at least 6 characters'}), 400
+        
+        # Create user
+        print(f"[SIGNUP] Creating user: {data['email']}")
+        user_data, error = UserManager.create_user(
+            email=data['email'].lower(),
+            password=data['password'],
+            first_name=data['first_name'],
+            last_name=data['last_name']
+        )
+        
+        if error:
+            print(f"[SIGNUP] User creation failed: {error}")
+            return jsonify({'error': error}), 400
+        
+        print(f"[SIGNUP] User created successfully: {user_data['email']}")
+        
+        # Create access token
+        access_token = create_access_token(identity=user_data['_id'])
+        
+        return jsonify({
+            'success': True,
+            'message': 'User registered successfully',
+            'access_token': access_token,
+            'user': user_data
+        }), 201
+        
+    except Exception as e:
+        print(f"[SIGNUP] Exception: {str(e)}")
+        return jsonify({'error': f'Signup failed: {str(e)}'}), 500
+
+
+@app.route('/auth/signin', methods=['POST'])
+
+@app.route('/auth/signin', methods=['POST'])
+def signin():
+    """
+    Authenticate user and return access token
+    
+    Expected request body (JSON):
+    {
+        "email": "user@example.com",
+        "password": "password123"
+    }
+    """
+    try:
+        data = request.get_json()
+        
+        # Validate input
+        if 'email' not in data or not data['email']:
+            return jsonify({'error': 'Email is required'}), 400
+        
+        if 'password' not in data or not data['password']:
+            return jsonify({'error': 'Password is required'}), 400
+        
+        # Authenticate user
+        user_data, error = UserManager.authenticate_user(
+            email=data['email'].lower(),
+            password=data['password']
+        )
+        
+        if error:
+            return jsonify({'error': error}), 401
+        
+        # Create access token
+        access_token = create_access_token(identity=user_data['_id'])
+        
+        return jsonify({
+            'success': True,
+            'message': 'Login successful',
+            'access_token': access_token,
+            'user': user_data
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': f'Login failed: {str(e)}'}), 500
+
+
+@app.route('/auth/me', methods=['GET'])
+@jwt_required()
+def get_current_user():
+    """Get current authenticated user info"""
+    try:
+        user_id = get_jwt_identity()
+        user_data = UserManager.get_user_by_id(user_id)
+        
+        if not user_data:
+            return jsonify({'error': 'User not found'}), 404
+        
+        return jsonify({
+            'success': True,
+            'user': user_data
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': f'Failed to get user: {str(e)}'}), 500
+
+
 @app.route('/analyze', methods=['POST'])
+@jwt_required()
 @validate_input()
 def analyze():
     """
     Analyze VCF file and predict drug response risks
+    Requires JWT authentication
     
     Expected request:
     - file: VCF format file (multipart/form-data)
@@ -112,6 +256,9 @@ def analyze():
     - patient_id (optional): Patient identifier
     """
     try:
+        # Get current user
+        user_id = get_jwt_identity()
+        
         # Extract parameters
         file = request.files['file']
         drug_input = request.form.get('drug', '')

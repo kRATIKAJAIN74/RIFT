@@ -23,8 +23,10 @@
    OPENAI_API_KEY        → sk-...
    GROQ_API_KEY          → gsk_...
    MONGODB_URI           → mongodb+srv://...
-   FRONTEND_URL          → Leave empty (or set after frontend deployed)
+   FRONTEND_URL          → Leave empty initially
    ```
+
+   **Note:** After deploying frontend, update `FRONTEND_URL` to your frontend URL for production CORS security.
 
 3. **Deploy**
    - Click "Create Web Service"

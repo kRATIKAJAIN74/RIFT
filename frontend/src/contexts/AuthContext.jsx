@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react'
+import { API_ENDPOINTS } from '../config/api'
 
 const AuthContext = createContext(null)
 
@@ -21,7 +22,7 @@ export function AuthProvider({ children }) {
 	const verifyToken = async (accessToken) => {
 		try {
 			console.log('Verifying token...')
-			const response = await fetch('http://localhost:5000/auth/me', {
+			const response = await fetch(API_ENDPOINTS.me, {
 				headers: {
 					'Authorization': `Bearer ${accessToken}`
 				}
@@ -54,7 +55,7 @@ export function AuthProvider({ children }) {
 			}
 			console.log('Sending signup request:', payload)
 			
-			const response = await fetch('http://localhost:5000/auth/signup', {
+			const response = await fetch(API_ENDPOINTS.signup, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(payload)
@@ -84,7 +85,7 @@ export function AuthProvider({ children }) {
 			const payload = { email, password }
 			console.log('Sending signin request:', { email })
 			
-			const response = await fetch('http://localhost:5000/auth/signin', {
+			const response = await fetch(API_ENDPOINTS.signin, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(payload)

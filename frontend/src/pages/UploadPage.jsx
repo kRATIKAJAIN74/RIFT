@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import { API_BASE_URL } from '../config/api'
 import ThemeToggle from '../components/ThemeToggle'
 
 const DRUG_OPTIONS = [
@@ -70,7 +71,7 @@ export default function UploadPage() {
 
 		try {
 			// Call backend assistant endpoint
-			const response = await fetch('http://localhost:5000/assistant/chat', {
+			const response = await fetch(`${API_BASE_URL}/assistant/chat`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -178,7 +179,7 @@ export default function UploadPage() {
 			formData.append('drug', JSON.stringify(selectedDrugs))
 			
 			// Call backend API with JWT token
-			const response = await fetch('http://localhost:5000/analyze', {
+			const response = await fetch(`${API_BASE_URL}/analyze`, {
 				method: 'POST',
 				headers: {
 					'Authorization': `Bearer ${token}`

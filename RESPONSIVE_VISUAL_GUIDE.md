@@ -290,6 +290,7 @@ bottom-4 right-4      bottom-8 right-8
 ---
 
 **Color Legend:**
+
 - 🟦 Blue = Interactive elements
 - 🟪 Purple = Gradient accents
 - ⚪ White/Light = Light mode

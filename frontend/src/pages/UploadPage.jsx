@@ -26,6 +26,7 @@ export default function UploadPage() {
 	const [chatInput, setChatInput] = useState('') // Current chat input
 	const [chatLoading, setChatLoading] = useState(false) // Loading state for chat
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+	const [showJsonModal, setShowJsonModal] = useState(false)
 	const { user, token, logout } = useAuth()
 	const navigate = useNavigate()
 
@@ -106,6 +107,30 @@ export default function UploadPage() {
 	// Handle quick action buttons
 	const handleQuickQuestion = (question) => {
 		handleSendMessage(question)
+	}
+
+	const handleDownloadJson = () => {
+		if (!results) return
+		
+		const jsonString = JSON.stringify(results, null, 2)
+		const blob = new Blob([jsonString], { type: 'application/json' })
+		const url = URL.createObjectURL(blob)
+		const link = document.createElement('a')
+		link.href = url
+		link.download = `pharma-analysis-${results.patient_id || 'results'}-${Date.now()}.json`
+		link.click()
+		URL.revokeObjectURL(url)
+	}
+
+	const handleCopyJson = () => {
+		if (!results) return
+		
+		const jsonString = JSON.stringify(results, null, 2)
+		navigator.clipboard.writeText(jsonString).then(() => {
+			alert('JSON copied to clipboard!')
+		}).catch(() => {
+			alert('Failed to copy JSON')
+		})
 	}
 
 	const validate = () => {
@@ -443,7 +468,21 @@ export default function UploadPage() {
 				{results && (
 					<div className="mt-8 space-y-6">
 						<div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-700 dark:bg-slate-800">
-							<h2 className="mb-6 text-2xl font-bold text-slate-900 dark:text-white">Analysis Results</h2>
+							<div className="flex items-center justify-between mb-6">
+								<h2 className="text-2xl font-bold text-slate-900 dark:text-white">Analysis Results</h2>
+								<div className="flex gap-2">
+									<button
+										onClick={() => setShowJsonModal(true)}
+										className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-700 dark:hover:bg-blue-900/50"
+										title="View JSON output"
+									>
+										<svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+										</svg>
+										<span className="hidden sm:inline">Get JSON</span>
+									</button>
+								</div>
+							</div>
 							<div className="space-y-4">
 								{results.analyses?.map((analysis, idx) => (
 									<div key={idx} className="rounded-xl border border-slate-200 bg-slate-50 p-6 dark:border-slate-700 dark:bg-slate-700/50">
@@ -506,10 +545,53 @@ export default function UploadPage() {
 						</div>
 					</div>
 				)}
-				</div>
-			</div>
 
-			{/* Floating Ask Assistant Button */}
+				{/* JSON Modal */}
+				{showJsonModal && results && (
+					<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={() => setShowJsonModal(false)}>
+						<div className="relative w-full max-w-4xl max-h-[90vh] bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 flex flex-col" onClick={(e) => e.stopPropagation()}>
+							{/* Modal Header */}
+							<div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-700">
+								<h3 className="text-xl font-semibold text-slate-900 dark:text-white">JSON Output</h3>
+								<div className="flex items-center gap-2">
+									<button
+										onClick={handleCopyJson}
+										className="px-3 py-1.5 text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600"
+										title="Copy to clipboard"
+									>
+										Copy
+									</button>
+									<button
+										onClick={handleDownloadJson}
+										className="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition"
+										title="Download JSON file"
+									>
+										Download
+									</button>
+									<button
+										onClick={() => setShowJsonModal(false)}
+										className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition"
+										title="Close"
+									>
+										<svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+										</svg>
+									</button>
+								</div>
+							</div>
+							{/* Modal Body - JSON Content */}
+							<div className="flex-1 overflow-auto p-6">
+								<pre className="text-xs sm:text-sm font-mono text-slate-800 dark:text-slate-200 bg-slate-50 dark:bg-slate-900 p-4 rounded-lg overflow-x-auto">
+									{JSON.stringify(results, null, 2)}
+								</pre>
+							</div>
+						</div>
+					</div>
+				)}
+			</div>
+		</div>
+
+		{/* Floating Ask Assistant Button */}
 			<button
 				onClick={() => setShowAssistant(!showAssistant)}
 				className="fixed bottom-4 right-4 sm:bottom-8 sm:right-8 z-50 p-3 sm:p-4 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-500/40 hover:shadow-xl hover:shadow-blue-500/60 transition-all duration-300 hover:scale-110 flex items-center justify-center group"

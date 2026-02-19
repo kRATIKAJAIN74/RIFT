@@ -1,6 +1,7 @@
 # 📱 Quick Responsive Design Reference
 
 ## Hamburger Menu Locations
+
 ```
 LandingPage:  [☰] Menu → Shows user info + logout
 UploadPage:   [☰] Menu → Shows user info + logout
@@ -11,6 +12,7 @@ SignupPage:   No hamburger (single form, already mobile-optimized)
 ## Layout Changes by Screen Size
 
 ### 📱 Mobile (< 640px)
+
 - **Navigation**: Hamburger menu only
 - **Stats Grid**: 2 columns
 - **Drug Selection**: 2 columns
@@ -18,6 +20,7 @@ SignupPage:   No hamburger (single form, already mobile-optimized)
 - **Logo Title**: Hidden (logo only)
 
 ### 📱 Small Tablet (640px - 767px)
+
 - **Navigation**: Still hamburger
 - **Stats Grid**: 2 columns
 - **Drug Selection**: 2 columns
@@ -25,6 +28,7 @@ SignupPage:   No hamburger (single form, already mobile-optimized)
 - **Logo Title**: Visible
 
 ### 💻 Tablet (768px - 1023px)
+
 - **Navigation**: Full nav (no hamburger)
 - **Stats Grid**: 2 columns
 - **Drug Selection**: 2 columns
@@ -32,6 +36,7 @@ SignupPage:   No hamburger (single form, already mobile-optimized)
 - **User Info**: Truncated
 
 ### 🖥️ Desktop (1024px+)
+
 - **Navigation**: Full nav with all details
 - **Stats Grid**: 4 columns
 - **Drug Selection**: 3 columns
@@ -41,6 +46,7 @@ SignupPage:   No hamburger (single form, already mobile-optimized)
 ## Critical Responsive Classes
 
 ### Text Scaling
+
 ```jsx
 // Hero heading
 text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl
@@ -53,6 +59,7 @@ text-xs sm:text-sm
 ```
 
 ### Container Spacing
+
 ```jsx
 // Horizontal padding
 px-3 sm:px-4    // Tight mobile → Standard tablet
@@ -64,6 +71,7 @@ py-6 sm:py-8    // Standard mobile → Spacious tablet
 ```
 
 ### Grid Layouts
+
 ```jsx
 // Stats cards (2 col mobile → 4 col desktop)
 grid-cols-2 lg:grid-cols-4
@@ -73,6 +81,7 @@ grid-cols-2 lg:grid-cols-3
 ```
 
 ### Navigation Display
+
 ```jsx
 // Desktop navigation (hide on mobile)
 hidden md:flex
@@ -84,6 +93,7 @@ flex md:hidden
 ## Testing Checklist
 
 ### ✅ Mobile (375px)
+
 - [ ] Hamburger menu works
 - [ ] All text readable
 - [ ] No horizontal scroll
@@ -91,18 +101,21 @@ flex md:hidden
 - [ ] Forms fit screen
 
 ### ✅ Tablet (768px)
+
 - [ ] Navigation switches to desktop
 - [ ] Grids look balanced
 - [ ] Images/videos scale
 - [ ] Spacing appropriate
 
 ### ✅ Desktop (1920px)
+
 - [ ] Full navigation visible
 - [ ] Content not too wide (max-w-7xl)
 - [ ] Stats in 4 columns
 - [ ] All details shown
 
 ## Common Breakpoint Values
+
 ```
 Mobile:       < 640px   (iPhone SE: 375px, most phones: 360-414px)
 Tablet:       640-1023px (iPad: 768px, iPad Pro: 1024px)
@@ -113,6 +126,7 @@ Large:        ≥ 1280px   (4K: 3840px)
 ## Quick Fixes
 
 ### If text too small on mobile:
+
 ```jsx
 // Change from
 text-sm
@@ -122,6 +136,7 @@ text-base sm:text-sm
 ```
 
 ### If button too cramped on mobile:
+
 ```jsx
 // Change from
 px-4 py-2
@@ -131,13 +146,15 @@ px-6 py-3 sm:px-4 sm:py-2
 ```
 
 ### If menu not hiding on desktop:
+
 ```jsx
 // Ensure you have
-className="hidden md:block"  // For desktop-only
-className="md:hidden"         // For mobile-only
+className = "hidden md:block"; // For desktop-only
+className = "md:hidden"; // For mobile-only
 ```
 
 ## Key Files Modified
+
 1. `frontend/src/pages/LandingPage.jsx` - Hamburger nav + responsive hero
 2. `frontend/src/pages/UploadPage.jsx` - Hamburger nav + responsive forms + assistant chat
 3. `frontend/src/pages/SigninPage.jsx` - Responsive auth form
@@ -147,6 +164,7 @@ className="md:hidden"         // For mobile-only
 ## Assistant Chat Responsive Features
 
 ### Button Position & Size
+
 ```jsx
 // Mobile: Bottom-right with smaller padding
 bottom-4 right-4 p-3 (icon: 20px)
@@ -156,6 +174,7 @@ bottom-8 right-8 p-4 (icon: 24px)
 ```
 
 ### Panel Layout
+
 ```jsx
 // Mobile: Full width with margins
 inset-x-4 bottom-20        // 16px from sides
@@ -167,6 +186,7 @@ max-h-96                   // 384px height
 ```
 
 ### Message Bubbles
+
 ```jsx
 // Mobile: Wider messages
 max-w-[85%]               // 85% of container
@@ -176,12 +196,14 @@ max-w-xs                  // 320px max
 ```
 
 ## Build Command
+
 ```bash
 cd frontend
 npm run build
 ```
 
 ## Dev Server (Test Responsive)
+
 ```bash
 cd frontend
 npm run dev
@@ -189,4 +211,5 @@ npm run dev
 ```
 
 ---
+
 **Note**: All responsive breakpoints follow Tailwind CSS defaults. Mobile-first approach means base styles target smallest screens first.

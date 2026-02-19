@@ -8,6 +8,7 @@ import uuid
 from datetime import datetime, timezone, timedelta
 from functools import wraps
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from werkzeug.utils import secure_filename
 import os
 from dotenv import load_dotenv
@@ -43,17 +44,29 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = MAX_FILE_SIZE
 
 # Enable CORS for frontend
-@app.before_request
-def handle_preflight():
-    if request.method == 'OPTIONS':
-        return '', 204
+# Development: Allows localhost. Production: Set FRONTEND_URL environment variable
+FRONTEND_URL = os.getenv('FRONTEND_URL', '')
 
-@app.after_request
-def after_request(response):
-    response.headers['Access-Control-Allow-Origin'] = '*'
-    response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Authorization'
-    response.headers['Access-Control-Allow-Methods'] = 'GET,PUT,POST,DELETE,OPTIONS'
-    return response
+if FRONTEND_URL and FRONTEND_URL != '*':
+    # Production: Specific origin(s) with credentials support
+    origins = [url.strip() for url in FRONTEND_URL.split(',')]
+    CORS(app, resources={
+        r"/*": {
+            "origins": origins,
+            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+            "allow_headers": ["Content-Type", "Authorization"],
+            "supports_credentials": True
+        }
+    })
+else:
+    # Development: Allow all origins (no credentials support with wildcard)
+    CORS(app, resources={
+        r"/*": {
+            "origins": "*",
+            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+            "allow_headers": ["Content-Type", "Authorization"]
+        }
+    })
 
 # Initialize components
 vcf_parser = VCFParser()
@@ -446,4 +459,9 @@ def internal_error(error):
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    # Get port from environment variable (Render sets this automatically)
+    port = int(os.getenv('PORT', 5000))
+    # In production, debug should be False
+    debug_mode = os.getenv('FLASK_ENV', 'development') == 'development'
+    
+    app.run(debug=debug_mode, host='0.0.0.0', port=port)

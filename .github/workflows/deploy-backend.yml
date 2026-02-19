@@ -1,0 +1,44 @@
+name: Deploy Backend to Render
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/deploy-backend.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Deploy to Render
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_SERVICE_ID: ${{ secrets.RENDER_BACKEND_SERVICE_ID }}
+        run: |
+          if [ -z "$RENDER_API_KEY" ] || [ -z "$RENDER_SERVICE_ID" ]; then
+            echo "⚠️  Render credentials not configured"
+            echo "Please set RENDER_API_KEY and RENDER_BACKEND_SERVICE_ID in GitHub Secrets"
+            echo "Steps:"
+            echo "1. Get API key from https://dashboard.render.com/api-tokens"
+            echo "2. Get Service ID from Render dashboard"
+            echo "3. Add to GitHub Secrets"
+            exit 0
+          fi
+          
+          echo "🚀 Triggering Render deployment..."
+          curl -X POST https://api.render.com/v1/services/$RENDER_SERVICE_ID/deploys \
+            -H "Authorization: Bearer $RENDER_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d '{}'
+          
+          echo "✅ Deployment triggered!"
+      
+      - name: Notify
+        run: |
+          echo "✅ Backend deployment initiated"
+          echo "Check: https://dashboard.render.com/"

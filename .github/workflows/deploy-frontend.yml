@@ -1,0 +1,40 @@
+name: Trigger Frontend Redeploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/deploy-frontend.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Trigger Render Redeploy
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_FRONTEND_SERVICE_ID: ${{ secrets.RENDER_FRONTEND_SERVICE_ID }}
+        run: |
+          if [ -z "$RENDER_API_KEY" ] || [ -z "$RENDER_FRONTEND_SERVICE_ID" ]; then
+            echo "⚠️  Frontend redeploy credentials not configured"
+            echo "Please set RENDER_API_KEY and RENDER_FRONTEND_SERVICE_ID in GitHub Secrets"
+            exit 0
+          fi
+          
+          echo "🚀 Triggering Frontend redeploy..."
+          curl -X POST https://api.render.com/v1/services/$RENDER_FRONTEND_SERVICE_ID/deploys \
+            -H "Authorization: Bearer $RENDER_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d '{}'
+          
+          echo "✅ Frontend redeploy triggered!"
+      
+      - name: Notify
+        run: |
+          echo "✅ Frontend redeploy initiated"
+          echo "Check: https://dashboard.render.com/"

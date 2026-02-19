@@ -25,6 +25,7 @@ export default function UploadPage() {
 	const [chatMessages, setChatMessages] = useState([]) // Chat conversation history
 	const [chatInput, setChatInput] = useState('') // Current chat input
 	const [chatLoading, setChatLoading] = useState(false) // Loading state for chat
+	const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 	const { user, token, logout } = useAuth()
 	const navigate = useNavigate()
 
@@ -219,53 +220,92 @@ export default function UploadPage() {
 			</video>
 
 			{/* Content Overlay */}
-			<div className="relative z-10 min-h-screen bg-gradient-to-b from-slate-50/80 to-white/80 dark:from-slate-900/90 dark:to-slate-800/90 px-4 py-8 backdrop-blur-sm overflow-x-hidden">
+			<div className="relative z-10 min-h-screen bg-gradient-to-b from-slate-50/80 to-white/80 dark:from-slate-900/90 dark:to-slate-800/90 px-3 sm:px-4 py-6 sm:py-8 backdrop-blur-sm overflow-x-hidden">
 				<div className="mx-auto w-full max-w-5xl">
 					{/* Top Navigation */}
-					<div className="mb-8 flex items-center justify-between">
-						<Link 
-							to="/" 
-							className="inline-flex items-center gap-2 text-slate-700 transition hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
-						>
-							<svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-							</svg>
-							<span className="font-medium">Back to Home</span>
-						</Link>
+					<div className="mb-6 sm:mb-8 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-xl border border-slate-200 dark:border-slate-700 p-3 sm:p-4">
+						<div className="flex items-center justify-between">
+							<Link 
+								to="/" 
+								className="inline-flex items-center gap-1.5 sm:gap-2 text-slate-700 transition hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
+							>
+								<svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+								</svg>
+								<span className="font-medium text-sm sm:text-base">Back to Home</span>
+							</Link>
 
-						<div className="flex items-center gap-4">
-							<ThemeToggle />
-							{user && (
-								<div className="flex items-center gap-4">
-									<div className="px-3 py-2 rounded-lg bg-blue-50 border border-blue-200 text-right dark:bg-blue-900/30 dark:border-blue-700">
-										<p className="text-sm font-semibold text-blue-900 dark:text-blue-100">{user.first_name} {user.last_name}</p>
-										<p className="text-xs text-blue-700 dark:text-blue-300">{user.email}</p>
+							{/* Desktop Navigation */}
+							<div className="hidden md:flex items-center gap-3 lg:gap-4">
+								<ThemeToggle />
+								{user && (
+									<div className="flex items-center gap-3">
+										<div className="px-3 py-2 rounded-lg bg-blue-50 border border-blue-200 text-right dark:bg-blue-900/30 dark:border-blue-700">
+											<p className="text-sm font-semibold text-blue-900 dark:text-blue-100 truncate max-w-[150px]">{user.first_name} {user.last_name}</p>
+											<p className="text-xs text-blue-700 dark:text-blue-300 truncate max-w-[150px]">{user.email}</p>
+										</div>
+										<button
+											onClick={handleLogout}
+											className="px-3 py-2 rounded-lg border border-slate-300 text-slate-700 text-sm font-medium hover:bg-slate-100 transition dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
+										>
+											Logout
+										</button>
 									</div>
-									<button
-										onClick={handleLogout}
-										className="px-3 py-2 rounded-lg border border-slate-300 text-slate-700 text-sm font-medium hover:bg-slate-100 transition dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
-									>
-										Logout
-									</button>
-								</div>
-							)}
+								)}
+							</div>
+
+							{/* Mobile Menu Button */}
+							<div className="flex md:hidden items-center gap-2">
+								<ThemeToggle />
+								<button
+									onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+									className="p-1.5 sm:p-2 rounded-lg text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 transition"
+									aria-label="Toggle menu"
+								>
+									{mobileMenuOpen ? (
+										<svg className="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+										</svg>
+									) : (
+										<svg className="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+										</svg>
+									)}
+								</button>
+							</div>
 						</div>
+
+						{/* Mobile Menu */}
+						{mobileMenuOpen && user && (
+							<div className="md:hidden mt-3 pt-3 border-t border-slate-200 dark:border-slate-700 space-y-3">
+								<div className="px-3 py-2 rounded-lg bg-blue-50 border border-blue-200 dark:bg-blue-900/30 dark:border-blue-700">
+									<p className="text-sm font-semibold text-blue-900 dark:text-blue-100">{user.first_name} {user.last_name}</p>
+									<p className="text-xs text-blue-700 dark:text-blue-300 mt-1">{user.email}</p>
+								</div>
+								<button
+									onClick={() => { handleLogout(); setMobileMenuOpen(false); }}
+									className="w-full px-3 py-2 rounded-lg border border-slate-300 text-slate-700 text-sm font-medium hover:bg-slate-100 transition dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700 text-center"
+								>
+									Logout
+								</button>
+							</div>
+						)}
 					</div>
 
 					{/* Page Header */}
-					<div className="mb-8">
-						<h1 className="mb-2 text-3xl font-bold text-slate-900 dark:text-white md:text-4xl">
+					<div className="mb-6 sm:mb-8">
+						<h1 className="mb-2 text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white md:text-4xl">
 							Pharmacogenomic Analysis
 						</h1>
-						<p className="text-base text-slate-600 dark:text-slate-300 md:text-lg">
+						<p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 md:text-lg">
 							Upload patient VCF file and select medications for risk assessment
 						</p>
 					</div>
 
 					{/* Error Messages */}
 					{errors.length > 0 && (
-						<div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-900/50 dark:bg-red-900/30">
-							<ul className="list-disc list-inside text-sm text-red-700 dark:text-red-300">
+						<div className="mb-4 sm:mb-6 rounded-lg border border-red-200 bg-red-50 p-3 sm:p-4 dark:border-red-900/50 dark:bg-red-900/30">
+							<ul className="list-disc list-inside text-xs sm:text-sm text-red-700 dark:text-red-300">
 								{errors.map((err, i) => (
 									<li key={i}>{err}</li>
 								))}
@@ -273,10 +313,10 @@ export default function UploadPage() {
 						</div>
 					)}
 
-					<form onSubmit={onSubmit} className="space-y-8">
+					<form onSubmit={onSubmit} className="space-y-6 sm:space-y-8">
 					{/* Section 1: Upload VCF File */}
-					<div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-700 dark:bg-slate-800">
-						<h2 className="mb-6 text-xl font-semibold text-slate-900 dark:text-white">1. Upload VCF File</h2>
+					<div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-slate-700 dark:bg-slate-800">
+						<h2 className="mb-4 sm:mb-6 text-lg sm:text-xl font-semibold text-slate-900 dark:text-white">1. Upload VCF File</h2>
 						
 						<div
 							className={`relative rounded-xl border-2 border-dashed p-12 text-center transition-colors ${
@@ -332,16 +372,16 @@ export default function UploadPage() {
 					</div>
 
 					{/* Section 2: Select Medications */}
-					<div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-700 dark:bg-slate-800">
-						<h2 className="mb-6 text-xl font-semibold text-slate-900 dark:text-slate-100">2. Select Medications</h2>
+					<div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 md:p-8 shadow-sm dark:border-slate-700 dark:bg-slate-800">
+						<h2 className="mb-4 sm:mb-6 text-lg sm:text-xl font-semibold text-slate-900 dark:text-slate-100">2. Select Medications</h2>
 						
-						<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+						<div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
 							{DRUG_OPTIONS.map((drug) => (
 								<button
 									key={drug}
 									type="button"
 									onClick={() => onDrugToggle(drug)}
-									className={`rounded-xl border-2 p-6 text-center text-base font-semibold transition-all ${
+									className={`rounded-lg sm:rounded-xl border-2 p-3 sm:p-4 md:p-6 text-center text-xs sm:text-sm md:text-base font-semibold transition-all ${
 										selectedDrugs.includes(drug)
 											? 'border-blue-500 bg-blue-50 text-blue-700 shadow-sm dark:bg-blue-900/30 dark:text-blue-100'
 											: 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-700/50 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:bg-slate-600'
@@ -353,7 +393,7 @@ export default function UploadPage() {
 						</div>
 
 						{/* Custom Drug Input */}
-						<div className="mt-6 flex gap-2">
+						<div className="mt-4 sm:mt-6 flex gap-2">
 							<input
 								type="text"
 								value={customDrug}
@@ -365,12 +405,12 @@ export default function UploadPage() {
 									}
 								}}
 								placeholder="Or enter custom drug name..."
-								className="flex-1 rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-700 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-300 dark:placeholder:text-slate-500 dark:focus:border-blue-500"
+								className="flex-1 rounded-lg border border-slate-300 bg-white px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-slate-700 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-300 dark:placeholder:text-slate-500 dark:focus:border-blue-500"
 							/>
 							<button
 								type="button"
 								onClick={handleAddCustomDrug}
-								className="rounded-lg border border-slate-300 bg-white px-6 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600"
+								className="rounded-lg border border-slate-300 bg-white px-4 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600"
 							>
 								Add
 							</button>
@@ -382,11 +422,11 @@ export default function UploadPage() {
 						<button
 							type="submit"
 							disabled={submitting}
-							className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-3 text-base font-semibold text-white shadow-lg shadow-blue-500/30 transition hover:shadow-xl hover:shadow-blue-500/40 disabled:cursor-not-allowed disabled:opacity-60"
+							className="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 px-6 sm:px-8 py-2.5 sm:py-3 text-sm sm:text-base font-semibold text-white shadow-lg shadow-blue-500/30 transition hover:shadow-xl hover:shadow-blue-500/40 disabled:cursor-not-allowed disabled:opacity-60 w-full sm:w-auto"
 						>
 							{submitting ? (
 								<>
-									<svg className="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">
+									<svg className="h-4 w-4 sm:h-5 sm:w-5 animate-spin" fill="none" viewBox="0 0 24 24">
 										<circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
 										<path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
 									</svg>
@@ -472,26 +512,26 @@ export default function UploadPage() {
 			{/* Floating Ask Assistant Button */}
 			<button
 				onClick={() => setShowAssistant(!showAssistant)}
-				className="fixed bottom-8 right-8 z-50 p-4 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-500/40 hover:shadow-xl hover:shadow-blue-500/60 transition-all duration-300 hover:scale-110 flex items-center justify-center group"
+				className="fixed bottom-4 right-4 sm:bottom-8 sm:right-8 z-50 p-3 sm:p-4 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-500/40 hover:shadow-xl hover:shadow-blue-500/60 transition-all duration-300 hover:scale-110 flex items-center justify-center group"
 				title="Ask Assistant"
 			>
-				<svg className="h-6 w-6 group-hover:rotate-12 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+				<svg className="h-5 w-5 sm:h-6 sm:w-6 group-hover:rotate-12 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 					<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
 				</svg>
 			</button>
 
 			{/* Assistant Panel */}
 			{showAssistant && (
-				<div className="fixed bottom-24 right-8 z-50 w-96 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden flex flex-col max-h-96">
+				<div className="fixed inset-x-4 bottom-20 sm:inset-x-auto sm:bottom-24 sm:right-8 z-50 w-auto sm:w-96 bg-white dark:bg-slate-800 rounded-xl sm:rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden flex flex-col max-h-[70vh] sm:max-h-96">
 					{/* Header */}
-					<div className="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-4 flex items-center justify-between flex-shrink-0">
+					<div className="bg-gradient-to-r from-blue-600 to-purple-600 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between flex-shrink-0">
 						<div className="flex items-center gap-2">
-							<div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
-								<svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/20 flex items-center justify-center">
+								<svg className="h-4 w-4 sm:h-5 sm:w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
 								</svg>
 							</div>
-							<h3 className="text-white font-semibold">PharmaGuard Assistant</h3>
+							<h3 className="text-white font-semibold text-sm sm:text-base">PharmaGuard Assistant</h3>
 						</div>
 						<button
 							onClick={() => {
@@ -506,26 +546,26 @@ export default function UploadPage() {
 					</div>
 
 					{/* Chat Messages Area */}
-					<div className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50 dark:bg-slate-700/30 scrollbar-styled">
+					<div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-2 sm:space-y-3 bg-slate-50 dark:bg-slate-700/30 scrollbar-styled">
 						{chatMessages.length === 0 ? (
-							<div className="text-center text-slate-500 dark:text-slate-400 text-sm">
-								<p className="mb-3">👋 Hello! How can I help you today?</p>
-								<div className="space-y-2">
+							<div className="text-center text-slate-500 dark:text-slate-400 text-xs sm:text-sm">
+								<p className="mb-2 sm:mb-3">👋 Hello! How can I help you today?</p>
+								<div className="space-y-1.5 sm:space-y-2">
 									<button
 										onClick={() => handleQuickQuestion('How do I upload a VCF file?')}
-										className="w-full text-left px-3 py-2 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-medium transition dark:bg-blue-900/20 dark:hover:bg-blue-900/40 dark:text-blue-300"
+										className="w-full text-left px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-medium transition dark:bg-blue-900/20 dark:hover:bg-blue-900/40 dark:text-blue-300"
 									>
 										💊 Upload VCF file
 									</button>
 									<button
 										onClick={() => handleQuickQuestion('What is pharmacogenomics and how does the analysis work?')}
-										className="w-full text-left px-3 py-2 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-700 text-xs font-medium transition dark:bg-purple-900/20 dark:hover:bg-purple-900/40 dark:text-purple-300"
+										className="w-full text-left px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-700 text-xs font-medium transition dark:bg-purple-900/20 dark:hover:bg-purple-900/40 dark:text-purple-300"
 									>
 										🧬 How it works
 									</button>
 									<button
 										onClick={() => handleQuickQuestion('What do the different risk levels mean?')}
-										className="w-full text-left px-3 py-2 rounded-lg bg-green-50 hover:bg-green-100 text-green-700 text-xs font-medium transition dark:bg-green-900/20 dark:hover:bg-green-900/40 dark:text-green-300"
+										className="w-full text-left px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg bg-green-50 hover:bg-green-100 text-green-700 text-xs font-medium transition dark:bg-green-900/20 dark:hover:bg-green-900/40 dark:text-green-300"
 									>
 										⚠️ Risk levels
 									</button>
@@ -534,7 +574,7 @@ export default function UploadPage() {
 						) : (
 							chatMessages.map((msg, idx) => (
 								<div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-									<div className={`max-w-xs rounded-lg px-3 py-2 text-sm ${
+									<div className={`max-w-[85%] sm:max-w-xs rounded-lg px-2.5 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm ${
 										msg.role === 'user'
 											? 'bg-blue-600 text-white'
 											: 'bg-white dark:bg-slate-600 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-500'
@@ -546,13 +586,13 @@ export default function UploadPage() {
 						)}
 						{chatLoading && (
 							<div className="flex justify-start">
-								<div className="bg-white dark:bg-slate-600 text-slate-500 dark:text-slate-300 rounded-lg px-3 py-2 text-sm">
+								<div className="bg-white dark:bg-slate-600 text-slate-500 dark:text-slate-300 rounded-lg px-2.5 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm">
 									<span className="animate-pulse">Thinking...</span>
 								</div>
 							</div>
 						)}
 						{chatMessages.length > 0 && !chatLoading && (
-							<div className="flex justify-center pt-2">
+							<div className="flex justify-center pt-1 sm:pt-2">
 								<button
 									onClick={() => setChatMessages([])}
 									className="text-xs text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition"
@@ -564,8 +604,8 @@ export default function UploadPage() {
 					</div>
 
 					{/* Input Area */}
-					<div className="border-t border-slate-200 dark:border-slate-700 px-4 py-3 bg-white dark:bg-slate-800 flex-shrink-0">
-						<div className="flex gap-2">
+					<div className="border-t border-slate-200 dark:border-slate-700 px-3 sm:px-4 py-2 sm:py-3 bg-white dark:bg-slate-800 flex-shrink-0">
+						<div className="flex gap-1.5 sm:gap-2">
 							<input
 								type="text"
 								value={chatInput}
@@ -577,12 +617,12 @@ export default function UploadPage() {
 								}}
 								placeholder="Ask anything..."
 								disabled={chatLoading}
-								className="flex-1 px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder:text-slate-400"
+								className="flex-1 px-2.5 sm:px-3 py-1.5 sm:py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder:text-slate-400"
 							/>
 							<button
 								onClick={() => handleSendMessage(chatInput)}
 								disabled={!chatInput.trim() || chatLoading}
-								className="px-3 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-400 text-white rounded-lg text-sm font-medium transition disabled:cursor-not-allowed"
+								className="px-2.5 sm:px-3 py-1.5 sm:py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-400 text-white rounded-lg text-xs sm:text-sm font-medium transition disabled:cursor-not-allowed"
 							>
 								<svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />

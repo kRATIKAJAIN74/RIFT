@@ -1,6 +1,6 @@
 // API Configuration
-// Production backend URL
-export const API_BASE_URL = 'https://backend-server-onsc.onrender.com'
+// Use environment variable if available, otherwise use production backend URL
+export const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://backend-server-onsc.onrender.com'
 
 // API endpoints
 export const API_ENDPOINTS = {

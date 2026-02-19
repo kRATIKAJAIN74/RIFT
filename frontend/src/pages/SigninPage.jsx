@@ -36,27 +36,27 @@ export default function SigninPage() {
 	}
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center px-4">
+		<div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center px-3 sm:px-4">
 			<div className="w-full max-w-md">
 				{/* Header */}
-				<div className="text-center mb-8">
-					<div className="flex justify-center mb-4">
-						<div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-							<svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+				<div className="text-center mb-6 sm:mb-8">
+					<div className="flex justify-center mb-3 sm:mb-4">
+						<div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+							<svg className="w-6 h-6 sm:w-7 sm:h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
 							</svg>
 						</div>
 					</div>
-					<h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">PharmaGuard</h1>
-					<p className="text-slate-600 dark:text-slate-400">Sign in to your account</p>
+					<h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white mb-1 sm:mb-2">PharmaGuard</h1>
+					<p className="text-sm sm:text-base text-slate-600 dark:text-slate-400">Sign in to your account</p>
 				</div>
 
 				{/* Card */}
-				<div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-8 border border-slate-200 dark:border-slate-700">
+				<div className="bg-white dark:bg-slate-800 rounded-xl sm:rounded-2xl shadow-lg p-5 sm:p-8 border border-slate-200 dark:border-slate-700">
 					{/* Error Messages */}
 					{errors.length > 0 && (
-						<div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-900/50 dark:bg-red-900/20">
-							<ul className="list-disc list-inside text-sm text-red-700 dark:text-red-300">
+						<div className="mb-4 sm:mb-6 rounded-lg border border-red-200 bg-red-50 p-3 sm:p-4 dark:border-red-900/50 dark:bg-red-900/20">
+							<ul className="list-disc list-inside text-xs sm:text-sm text-red-700 dark:text-red-300">
 								{errors.map((err, i) => (
 									<li key={i}>{err}</li>
 								))}
@@ -64,7 +64,7 @@ export default function SigninPage() {
 						</div>
 					)}
 
-					<form onSubmit={onSubmit} className="space-y-4">
+					<form onSubmit={onSubmit} className="space-y-3 sm:space-y-4">
 						{/* Email */}
 						<div>
 							<label htmlFor="email" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
@@ -101,21 +101,21 @@ export default function SigninPage() {
 						<button
 							type="submit"
 							disabled={submitting}
-							className="w-full mt-6 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-purple-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+							className="w-full mt-4 sm:mt-6 px-4 py-2.5 sm:py-2 text-sm sm:text-base bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-purple-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
 						>
 							{submitting ? 'Signing in...' : 'Sign In'}
 						</button>
 					</form>
 
 					{/* Divider */}
-					<div className="my-6 flex items-center">
+					<div className="my-4 sm:my-6 flex items-center">
 						<div className="flex-1 border-t border-slate-300 dark:border-slate-600"></div>
-						<span className="px-3 text-sm text-slate-500 dark:text-slate-400">or</span>
+						<span className="px-3 text-xs sm:text-sm text-slate-500 dark:text-slate-400">or</span>
 						<div className="flex-1 border-t border-slate-300 dark:border-slate-600"></div>
 					</div>
 
 					{/* Sign Up Link */}
-					<p className="text-center text-slate-600 dark:text-slate-400">
+					<p className="text-center text-sm sm:text-base text-slate-600 dark:text-slate-400">
 						Don't have an account?{' '}
 						<Link to="/signup" className="text-blue-600 dark:text-blue-400 font-semibold hover:text-blue-700 dark:hover:text-blue-300">
 							Sign Up

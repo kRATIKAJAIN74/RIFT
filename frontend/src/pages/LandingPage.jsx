@@ -20,7 +20,19 @@ const LandingPage = () => {
 	}
 
 	return (
-		<div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800">
+		<div className="relative w-full">
+			<video
+				autoPlay
+				loop
+				muted
+				playsInline
+				className="fixed inset-0 h-screen w-screen object-cover opacity-80"
+				style={{ zIndex: 0 }}
+			>
+				<source src="/landing.mp4" type="video/mp4" />
+			</video>
+
+			<div className="relative z-10 min-h-screen bg-gradient-to-b from-slate-50/80 to-white/80 dark:from-slate-900/90 dark:to-slate-800/90">
 			<header className="border-b border-slate-100 bg-white/80 backdrop-blur-sm dark:border-slate-700 dark:bg-slate-900/80">
 				<nav className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-4">
 					<div className="flex items-center gap-3">
@@ -114,6 +126,7 @@ const LandingPage = () => {
 					</div>
 				</section>
 			</main>
+			</div>
 		</div>
 	)
 }

@@ -2,10 +2,38 @@
   min-height: 100vh;
 }
 
-/* Custom scrollbar styling for light/dark theme */
+/* Global page scrollbar styling for light/dark theme */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(148 163 184) rgba(241 245 249 / 0.5);
+}
+
+html::-webkit-scrollbar {
+  width: 10px;
+}
+
+html::-webkit-scrollbar-track {
+  background: rgba(241 245 249 / 0.5);
+}
+
+html::-webkit-scrollbar-thumb {
+  background: rgb(148 163 184);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+html::-webkit-scrollbar-thumb:hover {
+  background: rgb(100 116 139);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+/* Custom container scrollbar styling for light/dark theme */
 .scrollbar-styled {
   scrollbar-width: thin;
-  scrollbar-color: rgb(148 163 184) transparent;
+  scrollbar-color: rgb(148 163 184) rgba(241 245 249 / 0.4);
 }
 
 .scrollbar-styled::-webkit-scrollbar {
@@ -13,12 +41,12 @@
 }
 
 .scrollbar-styled::-webkit-scrollbar-track {
-  background: transparent;
+  background: rgba(241 245 249 / 0.4);
 }
 
 .scrollbar-styled::-webkit-scrollbar-thumb {
   background: rgb(148 163 184);
-  border-radius: 3px;
+  border-radius: 9999px;
   transition: background 0.2s ease;
 }
 
@@ -27,12 +55,38 @@
 }
 
 /* Dark mode scrollbar */
+.dark html {
+  scrollbar-color: rgb(100 116 139) rgba(15 23 42 / 0.45);
+}
+
+.dark html::-webkit-scrollbar-track {
+  background: rgba(15 23 42 / 0.45);
+}
+
+.dark html::-webkit-scrollbar-thumb {
+  background: rgb(100 116 139);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+.dark html::-webkit-scrollbar-thumb:hover {
+  background: rgb(148 163 184);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
 .dark .scrollbar-styled {
-  scrollbar-color: rgb(68 76 91) transparent;
+  scrollbar-color: rgb(100 116 139) rgba(15 23 42 / 0.45);
+}
+
+.dark .scrollbar-styled::-webkit-scrollbar-track {
+  background: rgba(15 23 42 / 0.45);
 }
 
 .dark .scrollbar-styled::-webkit-scrollbar-thumb {
-  background: rgb(68 76 91);
+  background: rgb(100 116 139);
 }
 
 .dark .scrollbar-styled::-webkit-scrollbar-thumb:hover {

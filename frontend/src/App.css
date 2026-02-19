@@ -1,3 +1,40 @@
 #root {
   min-height: 100vh;
 }
+
+/* Custom scrollbar styling for light/dark theme */
+.scrollbar-styled {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(148 163 184) transparent;
+}
+
+.scrollbar-styled::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-styled::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-styled::-webkit-scrollbar-thumb {
+  background: rgb(148 163 184);
+  border-radius: 3px;
+  transition: background 0.2s ease;
+}
+
+.scrollbar-styled::-webkit-scrollbar-thumb:hover {
+  background: rgb(100 116 139);
+}
+
+/* Dark mode scrollbar */
+.dark .scrollbar-styled {
+  scrollbar-color: rgb(68 76 91) transparent;
+}
+
+.dark .scrollbar-styled::-webkit-scrollbar-thumb {
+  background: rgb(68 76 91);
+}
+
+.dark .scrollbar-styled::-webkit-scrollbar-thumb:hover {
+  background: rgb(100 116 139);
+}

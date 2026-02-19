@@ -12,6 +12,7 @@ from werkzeug.utils import secure_filename
 import os
 from dotenv import load_dotenv
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from groq import Groq
 
 from utils.vcf_parser import VCFParser
 from utils.pharmacogenomics import PharmacogenomicsAnalyzer
@@ -27,6 +28,9 @@ app = Flask(__name__)
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'your-secret-key-change-in-production')
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=30)
 jwt = JWTManager(app)
+
+# Initialize Groq client
+groq_client = Groq(api_key=os.getenv('GROQ_API_KEY'))
 
 # Configuration
 MAX_FILE_SIZE = 5 * 1024 * 1024  # 5 MB
@@ -352,6 +356,75 @@ def supported_drugs():
         'supported_drugs': drugs,
         'description': 'Drugs with available pharmacogenomics data'
     }), 200
+
+
+@app.route('/assistant/chat', methods=['POST'])
+@jwt_required()
+def assistant_chat():
+    """
+    Chat with PharmaGuard Assistant powered by Groq.
+    
+    Request body:
+    {
+        "message": "user message",
+        "conversation_history": [
+            {"role": "user", "content": "previous message"},
+            {"role": "assistant", "content": "previous response"}
+        ]
+    }
+    """
+    try:
+        user_id = get_jwt_identity()
+        data = request.json
+        user_message = data.get('message', '').strip()
+        conversation_history = data.get('conversation_history', [])
+        
+        if not user_message:
+            return jsonify({'error': 'Message cannot be empty'}), 400
+        
+        # Build system prompt for pharmacogenomics assistant
+        system_prompt = """You are PharmaGuard, an expert pharmacogenomics assistant. You help users understand:
+- VCF file formats and how to prepare genetic data
+- Pharmacogenomic analysis and how it works
+- Drug-gene interactions and risk levels
+- How to interpret analysis results
+- Genetic variations and their clinical significance
+
+Be helpful, accurate, and clear in your explanations. Keep responses concise but informative.
+If asked something outside pharmacogenomics, politely redirect to your area of expertise."""
+        
+        # Prepare messages for Groq
+        messages = [
+            {"role": "user" if msg.get("role") == "user" else "assistant", "content": msg["content"]}
+            for msg in conversation_history
+        ]
+        messages.append({"role": "user", "content": user_message})
+        
+        # Call Groq API
+        completion = groq_client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                *messages
+            ],
+            temperature=0.7,
+            max_tokens=1024,
+        )
+        
+        assistant_message = completion.choices[0].message.content
+        
+        print(f"[ASSISTANT] User {user_id}: {user_message}")
+        print(f"[ASSISTANT] Response: {assistant_message[:100]}...")
+        
+        return jsonify({
+            'success': True,
+            'message': assistant_message,
+            'timestamp': datetime.now(timezone.utc).isoformat()
+        }), 200
+        
+    except Exception as e:
+        print(f"[ASSISTANT ERROR] {str(e)}")
+        return jsonify({'error': f'Assistant error: {str(e)}'}), 500
 
 
 @app.errorhandler(413)

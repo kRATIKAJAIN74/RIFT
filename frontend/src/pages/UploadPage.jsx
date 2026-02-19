@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import ThemeToggle from '../components/ThemeToggle'
@@ -21,12 +21,89 @@ export default function UploadPage() {
 	const [dragActive, setDragActive] = useState(false)
 	const [customDrug, setCustomDrug] = useState('')
 	const [showAssistant, setShowAssistant] = useState(false)
+	const [chatMessages, setChatMessages] = useState([]) // Chat conversation history
+	const [chatInput, setChatInput] = useState('') // Current chat input
+	const [chatLoading, setChatLoading] = useState(false) // Loading state for chat
 	const { user, token, logout } = useAuth()
 	const navigate = useNavigate()
 
+	// Load chat from localStorage on mount
+	useEffect(() => {
+		if (user?.id) {
+			const savedChat = localStorage.getItem(`chat_messages_${user.id}`)
+			if (savedChat) {
+				try {
+					setChatMessages(JSON.parse(savedChat))
+				} catch (err) {
+					console.error('Failed to load chat from storage:', err)
+				}
+			}
+		}
+	}, [user?.id])
+
+	// Save chat to localStorage whenever it changes
+	useEffect(() => {
+		if (user?.id && chatMessages.length > 0) {
+			localStorage.setItem(`chat_messages_${user.id}`, JSON.stringify(chatMessages))
+		}
+	}, [chatMessages, user?.id])
+
 	const handleLogout = () => {
+		// Clear chat from localStorage
+		if (user?.id) {
+			localStorage.removeItem(`chat_messages_${user.id}`)
+		}
 		logout()
 		navigate('/')
+	}
+
+	// Assistant chat handlers
+	const handleSendMessage = async (message) => {
+		if (!message.trim()) return
+
+		// Add user message to chat
+		const userMessage = { role: 'user', content: message }
+		const updatedMessages = [...chatMessages, userMessage]
+		setChatMessages(updatedMessages)
+		setChatInput('')
+		setChatLoading(true)
+
+		try {
+			// Call backend assistant endpoint
+			const response = await fetch('http://localhost:5000/assistant/chat', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${token}`
+				},
+				body: JSON.stringify({
+					message: message,
+					conversation_history: chatMessages
+				})
+			})
+
+			const data = await response.json()
+
+			if (!response.ok) {
+				throw new Error(data.error || 'Failed to get assistant response')
+			}
+
+			// Add assistant response to chat
+			const assistantMessage = { role: 'assistant', content: data.message }
+			setChatMessages([...updatedMessages, assistantMessage])
+		} catch (err) {
+			console.error('Chat error:', err)
+			// Add error message
+			const errorMessage = { role: 'assistant', content: `Error: ${err.message}` }
+			setChatMessages([...updatedMessages, errorMessage])
+		} finally {
+			setChatLoading(false)
+		}
+	}
+
+	// Handle quick action buttons
+	const handleQuickQuestion = (question) => {
+		handleSendMessage(question)
 	}
 
 	const validate = () => {
@@ -254,8 +331,8 @@ export default function UploadPage() {
 					</div>
 
 					{/* Section 2: Select Medications */}
-					<div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-						<h2 className="mb-6 text-xl font-semibold text-slate-900">2. Select Medications</h2>
+					<div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-700 dark:bg-slate-800">
+						<h2 className="mb-6 text-xl font-semibold text-slate-900 dark:text-slate-100">2. Select Medications</h2>
 						
 						<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
 							{DRUG_OPTIONS.map((drug) => (
@@ -404,9 +481,9 @@ export default function UploadPage() {
 
 			{/* Assistant Panel */}
 			{showAssistant && (
-				<div className="fixed bottom-24 right-8 z-50 w-96 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+				<div className="fixed bottom-24 right-8 z-50 w-96 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden flex flex-col max-h-96">
 					{/* Header */}
-					<div className="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-4 flex items-center justify-between">
+					<div className="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-4 flex items-center justify-between flex-shrink-0">
 						<div className="flex items-center gap-2">
 							<div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
 								<svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -416,7 +493,9 @@ export default function UploadPage() {
 							<h3 className="text-white font-semibold">PharmaGuard Assistant</h3>
 						</div>
 						<button
-							onClick={() => setShowAssistant(false)}
+							onClick={() => {
+								setShowAssistant(false)
+							}}
 							className="text-white/80 hover:text-white transition"
 						>
 							<svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -425,31 +504,90 @@ export default function UploadPage() {
 						</button>
 					</div>
 
-					{/* Content */}
-					<div className="p-6">
-						<p className="text-slate-600 dark:text-slate-400 text-sm mb-4">
-							Hello! I'm here to help you with your pharmacogenomic analysis. How can I assist you today?
-						</p>
-						
-						<div className="space-y-2">
-							<button className="w-full text-left px-4 py-3 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 text-sm font-medium transition border border-blue-200 dark:bg-blue-900/20 dark:hover:bg-blue-900/40 dark:text-blue-300 dark:border-blue-700">
-								💊 Help with uploading VCF file
-							</button>
-							<button className="w-full text-left px-4 py-3 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-700 text-sm font-medium transition border border-purple-200 dark:bg-purple-900/20 dark:hover:bg-purple-900/40 dark:text-purple-300 dark:border-purple-700">
-								🧬 Understand the analysis
-							</button>
-							<button className="w-full text-left px-4 py-3 rounded-lg bg-green-50 hover:bg-green-100 text-green-700 text-sm font-medium transition border border-green-200 dark:bg-green-900/20 dark:hover:bg-green-900/40 dark:text-green-300 dark:border-green-700">
-								⚠️ Risk levels explanation
-							</button>
-							<button className="w-full text-left px-4 py-3 rounded-lg bg-orange-50 hover:bg-orange-100 text-orange-700 text-sm font-medium transition border border-orange-200 dark:bg-orange-900/20 dark:hover:bg-orange-900/40 dark:text-orange-300 dark:border-orange-700">
-								❓ Ask a question
-							</button>
-						</div>
+					{/* Chat Messages Area */}
+					<div className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50 dark:bg-slate-700/30 scrollbar-styled">
+						{chatMessages.length === 0 ? (
+							<div className="text-center text-slate-500 dark:text-slate-400 text-sm">
+								<p className="mb-3">👋 Hello! How can I help you today?</p>
+								<div className="space-y-2">
+									<button
+										onClick={() => handleQuickQuestion('How do I upload a VCF file?')}
+										className="w-full text-left px-3 py-2 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-medium transition dark:bg-blue-900/20 dark:hover:bg-blue-900/40 dark:text-blue-300"
+									>
+										💊 Upload VCF file
+									</button>
+									<button
+										onClick={() => handleQuickQuestion('What is pharmacogenomics and how does the analysis work?')}
+										className="w-full text-left px-3 py-2 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-700 text-xs font-medium transition dark:bg-purple-900/20 dark:hover:bg-purple-900/40 dark:text-purple-300"
+									>
+										🧬 How it works
+									</button>
+									<button
+										onClick={() => handleQuickQuestion('What do the different risk levels mean?')}
+										className="w-full text-left px-3 py-2 rounded-lg bg-green-50 hover:bg-green-100 text-green-700 text-xs font-medium transition dark:bg-green-900/20 dark:hover:bg-green-900/40 dark:text-green-300"
+									>
+										⚠️ Risk levels
+									</button>
+								</div>
+							</div>
+						) : (
+							chatMessages.map((msg, idx) => (
+								<div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+									<div className={`max-w-xs rounded-lg px-3 py-2 text-sm ${
+										msg.role === 'user'
+											? 'bg-blue-600 text-white'
+											: 'bg-white dark:bg-slate-600 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-500'
+									}`}>
+										{msg.content}
+									</div>
+								</div>
+							))
+						)}
+						{chatLoading && (
+							<div className="flex justify-start">
+								<div className="bg-white dark:bg-slate-600 text-slate-500 dark:text-slate-300 rounded-lg px-3 py-2 text-sm">
+									<span className="animate-pulse">Thinking...</span>
+								</div>
+							</div>
+						)}
+						{chatMessages.length > 0 && !chatLoading && (
+							<div className="flex justify-center pt-2">
+								<button
+									onClick={() => setChatMessages([])}
+									className="text-xs text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition"
+								>
+									Clear chat
+								</button>
+							</div>
+						)}
 					</div>
 
-					{/* Footer */}
-					<div className="border-t border-slate-200 dark:border-slate-700 px-6 py-3 bg-slate-50 dark:bg-slate-700 text-xs text-slate-500 dark:text-slate-400 text-center">
-						Powered by PharmaGuard AI
+					{/* Input Area */}
+					<div className="border-t border-slate-200 dark:border-slate-700 px-4 py-3 bg-white dark:bg-slate-800 flex-shrink-0">
+						<div className="flex gap-2">
+							<input
+								type="text"
+								value={chatInput}
+								onChange={(e) => setChatInput(e.target.value)}
+								onKeyPress={(e) => {
+									if (e.key === 'Enter' && !chatLoading) {
+										handleSendMessage(chatInput)
+									}
+								}}
+								placeholder="Ask anything..."
+								disabled={chatLoading}
+								className="flex-1 px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder:text-slate-400"
+							/>
+							<button
+								onClick={() => handleSendMessage(chatInput)}
+								disabled={!chatInput.trim() || chatLoading}
+								className="px-3 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-400 text-white rounded-lg text-sm font-medium transition disabled:cursor-not-allowed"
+							>
+								<svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+								</svg>
+							</button>
+						</div>
 					</div>
 				</div>
 			)}

@@ -1,0 +1,42 @@
+{
+  "timestamp": "2026-02-20T04:10:56.133454",
+  "summary": {
+    "total_tests": 3,
+    "passed": 1,
+    "failed": 2,
+    "pass_rate": 33.33333333333333,
+    "compliance_rate": 30.0,
+    "requirements": {
+      "VCF File Parsing": false,
+      "6 Gene Support (CYP2D6, CYP2C19, CYP2C9, SLCO1B1, TPMT, DPYD)": false,
+      "Multiple Drug Analysis": false,
+      "5 Risk Categories": false,
+      "JSON Schema Compliance": false,
+      "LLM Integration": false,
+      "CPIC Alignment": false,
+      "Error Handling": true,
+      "MongoDB Integration": true,
+      "Web Interface": true
+    }
+  },
+  "detailed_results": [
+    {
+      "test": "VCF Parsing",
+      "passed": false,
+      "details": "Error: 'list' object has no attribute 'keys'",
+      "status": "\u2717 FAIL"
+    },
+    {
+      "test": "Error Handling - Invalid Drug",
+      "passed": false,
+      "details": "Returns Unknown for unsupported drug",
+      "status": "\u2717 FAIL"
+    },
+    {
+      "test": "Error Handling - Empty Genetic Profile",
+      "passed": true,
+      "details": "Gracefully handles missing variants",
+      "status": "\u2713 PASS"
+    }
+  ]
+}

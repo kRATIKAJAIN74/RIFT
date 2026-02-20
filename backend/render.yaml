@@ -1,5 +1,6 @@
 services:
   - type: web
+<<<<<<< HEAD
     name: pharmaguard-api
     runtime: python
     region: oregon
@@ -10,14 +11,34 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
+=======
+    name: rift-backend
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120
+    envVars:
+      - key: MONGO_URI
+        sync: false
+      - key: MONGO_DB
+        value: rift
+>>>>>>> 1266c744799165467421f43fdd9c57a3b9418c37
       - key: JWT_SECRET_KEY
         generateValue: true
       - key: OPENAI_API_KEY
         sync: false
       - key: GROQ_API_KEY
         sync: false
+<<<<<<< HEAD
       - key: MONGODB_URI
         sync: false
       - key: FRONTEND_URL
         sync: false
     healthCheckPath: /health
+=======
+      - key: FLASK_ENV
+        value: production
+      - key: PYTHON_VERSION
+        value: 3.11.0
+>>>>>>> 1266c744799165467421f43fdd9c57a3b9418c37
